@@ -1,21 +1,27 @@
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
+    id("groovy")
     id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.6"
+    id("net.researchgate.release") version "3.0.2"
+    id("maven-publish")
+    kotlin("jvm") version "1.9.25"
+    kotlin("plugin.spring") version "1.9.25"
 }
 
 group = "bible.game"
 version = "0.0.1-SNAPSHOT"
 
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
-}
-
-repositories {
-    mavenCentral()
 }
 
 
@@ -30,8 +36,13 @@ subprojects {
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
         implementation("org.projectlombok:lombok:1.18.36")
-        implementation("game.bible:common:0.0.1-SNAPSHOT")
-        implementation("io.github.microutils.kotlin-logging:kotlin-logging:1.6.26")
+//        implementation("game.bible:common:0.0.1-SNAPSHOT")
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
     }
 
     kotlin {

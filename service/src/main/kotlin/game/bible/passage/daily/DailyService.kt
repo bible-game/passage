@@ -14,7 +14,7 @@ class DailyService {
 
     /** Generates today's bible passage and retrieves it from storage */
     fun retrievePassage(): Passage {
-        return Passage()
+        return Passage("mark", "5")
     }
 
 }
