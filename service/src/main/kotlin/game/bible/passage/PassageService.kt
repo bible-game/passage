@@ -1,4 +1,4 @@
-package com.kotlin.multimodulespringboot
+package game.bible.passage
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

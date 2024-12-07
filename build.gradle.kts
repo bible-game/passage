@@ -18,20 +18,26 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict")
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+
+    dependencies {
+        implementation("org.springframework.boot:spring-boot-starter")
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+        implementation("org.projectlombok:lombok:1.18.36")
+        implementation("game.bible:common:0.0.1-SNAPSHOT")
+        implementation("io.github.microutils.kotlin-logging:kotlin-logging:1.6.26")
     }
-}
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+    kotlin {
+        compilerOptions {
+            freeCompilerArgs.addAll("-Xjsr305=strict")
+        }
+    }
+
 }
