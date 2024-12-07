@@ -1,15 +1,15 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("groovy")
-    id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.6"
     id("net.researchgate.release") version "3.0.2"
     id("maven-publish")
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-}
 
-group = "bible.game"
-version = "0.0.1-SNAPSHOT"
+    alias(libs.plugins.spring.boot)
+}
 
 allprojects {
     repositories {
@@ -37,18 +37,8 @@ subprojects {
 
         implementation("org.projectlombok:lombok:1.18.36")
 //        implementation("game.bible:common:0.0.1-SNAPSHOT")
-    }
 
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
-    }
-
-    kotlin {
-        compilerOptions {
-            freeCompilerArgs.addAll("-Xjsr305=strict")
-        }
+        api(libs.bundles.core)
     }
 
 }
