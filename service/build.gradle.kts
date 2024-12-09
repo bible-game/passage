@@ -8,7 +8,6 @@ plugins {
 
 dependencies {
     implementation(project(":model"))
-    implementation("game.bible:common:0.0.1-SNAPSHOT")
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
