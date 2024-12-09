@@ -4,6 +4,8 @@ plugins {
     id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.6"
     id("maven-publish")
+
+    kotlin("plugin.jpa") version "1.9.25"
 }
 
 dependencies {
