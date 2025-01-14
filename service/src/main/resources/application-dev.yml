@@ -1,7 +1,3 @@
-server:
-  port: 8081
-
-# todo :: move to application-test.yml
 #spring:
 #  datasource:
 #    url: jdbc:h2:mem:demo
@@ -12,7 +8,3 @@ server:
 #    database-platform: org.hibernate.dialect.H2Dialect
 #  h2:
 #    console.enabled: true
-
-application:
-  config:
-    dir: "${CONFIGURATION:/opt/configuration}"

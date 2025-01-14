@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service
 @Service
 class DailyService(
     private val generator: GenerationService,
-    private val passageRepository: PassageRepository) {
+    private val passageRepository: PassageRepository
+) {
 
     companion object : Log()
     private var cache: Passage? = null

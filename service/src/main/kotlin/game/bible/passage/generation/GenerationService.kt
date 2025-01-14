@@ -1,9 +1,13 @@
 package game.bible.passage.generation
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import game.bible.config.model.domain.BibleConfig
+import game.bible.config.model.integration.BibleApiConfiguration
 import game.bible.config.model.service.PassageConfig
 import game.bible.passage.Passage
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestClient
 import kotlin.random.Random
 
 /**
@@ -14,8 +18,11 @@ import kotlin.random.Random
  */
 @Service
 class GenerationService(
+    private val api: BibleApiConfiguration,
     private val bible: BibleConfig,
     private val config: PassageConfig,
+    private val mapper: ObjectMapper,
+    private val restClient: RestClient
 ) {
 
     /** Generates a random bible passage */
@@ -38,7 +45,22 @@ class GenerationService(
         // Which ending verse?
         val verseEnd = verseStart + range
 
-        return Passage(book, chapter, verseStart, verseEnd)
+        // Which text?
+        val text = fetchText("$book+$chapter:$verseStart-$verseEnd")
+
+        return Passage(book, chapter, verseStart, verseEnd, text)
+    }
+
+    /** Fetches the text for generated passage */
+    fun fetchText(passageId: String): String {
+        val url = "${api.getBaseUrl()}/$passageId"
+
+        val response = restClient.get()
+                        .uri(url).retrieve()
+                        .body(String::class.java)
+
+        val jsonNode: JsonNode = mapper.readTree(response)
+        return jsonNode["text"].asText()
     }
 
 }

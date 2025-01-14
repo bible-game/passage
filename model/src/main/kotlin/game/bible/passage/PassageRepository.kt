@@ -15,9 +15,9 @@ import java.util.Optional
 interface PassageRepository : JpaRepository<Passage, Long> {
 
     @Query(
-        value = "SELECT TOP 1 * FROM Passage " +
-                "WHERE created_date >= CURDATE()", nativeQuery = true)
-    // Improvement :: could place upper bound using tomorrow's date
+        "SELECT p FROM Passage p " +
+        "WHERE p.createdDate >= current_date " +
+        "ORDER BY p.createdDate ASC LIMIT 1")
     fun findToday(): Optional<Passage>
 
 }

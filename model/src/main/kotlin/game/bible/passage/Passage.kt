@@ -1,6 +1,7 @@
 package game.bible.passage
 
 import game.bible.common.model.BaseEntity
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
 
@@ -16,5 +17,8 @@ class Passage(
     val book: String,
     val chapter: Int,
     val verseStart: Int,
-    val verseEnd: Int
+    val verseEnd: Int,
+
+    @Column(columnDefinition="TEXT")
+    val text: String
 ) : BaseEntity()
