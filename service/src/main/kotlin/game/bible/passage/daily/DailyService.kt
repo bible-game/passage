@@ -1,7 +1,6 @@
 package game.bible.passage.daily
 
 import game.bible.common.util.log.Log
-import game.bible.config.model.Bible
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
 import game.bible.passage.generation.GenerationService
