@@ -21,13 +21,14 @@ class DailyController(private val service: DailyService) {
 
     /** Returns today's bible passage */
     @GetMapping
-    fun getPassage(): ResponseEntity<Any> {
+    fun getPassage(): ResponseEntity<Any> { // Implement custom response object
         return try {
             val response: Passage = service.retrievePassage()
             ResponseEntity.ok(response)
 
         } catch (e: Exception) {
-            log.error("Some error!")
+//            log.error("Some error!") // TODO :: proper err handle
+            log.error(e.message)
             ResponseEntity.ok("Some error!")
         }
     }

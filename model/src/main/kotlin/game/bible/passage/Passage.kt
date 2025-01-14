@@ -12,9 +12,9 @@ import jakarta.persistence.Table
  */
 @Entity
 @Table(name = "passage")
-data class Passage (
-    var book: String,
-    var chapter: Int,
-    var verseStart: Int,
-    var verseEnd: Int
+class Passage(
+    val book: String,
+    val chapter: Int,
+    val verseStart: Int,
+    val verseEnd: Int
 ) : BaseEntity()

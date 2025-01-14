@@ -3,6 +3,8 @@ plugins {
     kotlin("plugin.spring") version "1.9.25"
     id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.6"
+    id("org.jetbrains.kotlin.plugin.noarg") version "2.1.20-Beta1"
+    // TODO :: apply from ver cat
     id("maven-publish")
 }
 

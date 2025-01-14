@@ -1,8 +1,10 @@
 package game.bible.passage.daily
 
 import game.bible.common.util.log.Log
+import game.bible.config.model.Bible
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
+import game.bible.passage.generation.GenerationService
 import org.springframework.stereotype.Service
 
 /**
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class DailyService(
+    private val generator: GenerationService,
     private val passageRepository: PassageRepository) {
 
     companion object : Log()
@@ -22,7 +25,7 @@ class DailyService(
     fun retrievePassage(): Passage {
         if (cache == null) {
             log.debug("No cached passage! Searching database for today's entry")
-            val today = passageRepository.findById(1L)
+            val today = passageRepository.findToday()
 
             cache = if (today.isPresent) today.get()
                         else generatePassage()
@@ -33,7 +36,7 @@ class DailyService(
 
     private fun generatePassage(): Passage {
         log.debug("No entry exists for today! Generating random passage")
-        val randomPassage = Passage("mark", 5, 10, 12) // TODO
+        val randomPassage = generator.random()
 
         return passageRepository.save(randomPassage)
     }
