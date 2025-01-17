@@ -13,12 +13,12 @@ import jakarta.persistence.Table
  */
 @Entity
 @Table(name = "passage")
-class Passage(
-    val book: String,
-    val chapter: Int,
-    val verseStart: Int,
-    val verseEnd: Int,
+data class Passage(
+    val book: String = "",
+    val chapter: Int = 0,
+    val verseStart: Int = 0,
+    val verseEnd: Int = 0,
 
     @Column(columnDefinition="TEXT")
-    val text: String
+    val text: String = ""
 ) : BaseEntity()
