@@ -15,7 +15,8 @@ server:
 
 application:
   config:
-    dir: "${CONFIGURATION:/opt/configuration}"
+    dir: "${CONFIGURATION:/etc/secrets/}"
+    # Improvement :: is there a better place on render to keep config?
 management:
   endpoints:
     web:
