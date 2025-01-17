@@ -16,3 +16,7 @@ server:
 application:
   config:
     dir: "${CONFIGURATION:/opt/configuration}"
+management:
+  endpoints:
+    web:
+      base-path: /
