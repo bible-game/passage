@@ -25,25 +25,20 @@ class GenerationService(
 
     /** Generates a random bible passage */
     fun random(): Passage {
-        val random: Int = Random.nextInt(0, 1)
-        val testament = if (random == 0) bible.getOld() else bible.getOld() // .getNew()
-
         // Which book?
-        val book: String = testament?.keys!!.random()
+        val random = bible.getBooks()!!.random()
+        val book = random.getBook()!!
 
-        // Which chapter?
-        val chapter = testament[book]!!.keys.random()
-        val passages = testament[book]?.get(chapter)
+        // Which passage?
+        val passage = random.getChapters()!!.random()
+        val chapter = passage.getChapter()!!
+        val title = passage.getTitle()!!
+        val verseStart = passage.getVerseStart()!!
+        val verseEnd = passage.getVerseEnd()!!
 
-        // Which verses?
-        val summary = passages!!.keys.random()
-        val verses = passages[summary]!!
-
-        // Which text?
-        val verseStart = verses[0]; val verseEnd = verses[1]
         val text = fetchText("$book+$chapter:$verseStart-$verseEnd")
 
-        return Passage(book, chapter, summary, verseStart, verseEnd, text)
+        return Passage(book, chapter, title, verseStart, verseEnd, text)
     }
 
     /** Fetches the text for generated passage */

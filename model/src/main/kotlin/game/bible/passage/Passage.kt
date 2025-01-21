@@ -16,7 +16,7 @@ import jakarta.persistence.Table
 data class Passage(
     val book: String = "",
     val chapter: Int = 0,
-    val summary: String = "",
+    val title: String = "",
     val verseStart: Int = 0,
     val verseEnd: Int = 0,
 
