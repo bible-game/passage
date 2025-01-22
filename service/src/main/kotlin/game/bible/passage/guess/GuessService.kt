@@ -1,6 +1,7 @@
 package game.bible.passage.guess
 
 import game.bible.config.model.domain.BibleConfig
+import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
@@ -21,20 +22,40 @@ class GuessService(
         val today = passageRepository.findToday().getOrNull()!! // todo :: if null, throw Ex (code? 400?)
 
         val correct = (today.book == guess.first && today.title == guess.second)
-        val closeness = if (correct) 100 else calculateCloseness(guess)
+        val closeness = if (correct) 100 else calculateCloseness(guess, today)
 
         return closeness
     }
 
-    private fun calculateCloseness(guess: Pair<String, String>): Int { // todo :: flesh this out later...
-        val totalVerses = 300 // 31_102
+    private fun calculateCloseness(guess: Pair<String, String>, answer: Passage): Int {
+        val totalVerses = 475 // 31_102
+        // Question :: should revelation be ~0% not 60%?
         var verseDistance = 0
+        var altDistance = 0
 
-        // note :: starting with a simple case -> guess < answer (sum verses in the config that are in between)
-        val book = bibleConfig.getBooks()!!.filter { it.getBook() == guess.first }[0]
-        val passage = book.getChapters()!!.filter { it.getTitle() == guess.second }[0]
+        val books = bibleConfig.getBooks()!!
+        val guessIndex = books.indexOfFirst { it.getBook() == guess.first }
+        val answerIndex = books.indexOfFirst { it.getBook() == answer.book }
 
-        verseDistance += passage.getVerseEnd()!!
+        val lower = if (guessIndex <= answerIndex) guessIndex else answerIndex
+        val upper = if (guessIndex <= answerIndex) answerIndex else guessIndex
+
+        val bookList = books.subList(lower, upper)
+        val altList = books.filterNot { it in bookList }
+
+        for (book in bookList) {
+            book.getChapters()!!.forEach { chapter ->
+                verseDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
+            }
+        }
+
+        for (book in altList) {
+            book.getChapters()!!.forEach { chapter ->
+                altDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
+            }
+        }
+
+        if (altDistance > verseDistance) verseDistance = altDistance
 
         return (verseDistance * 100 / totalVerses)
     }

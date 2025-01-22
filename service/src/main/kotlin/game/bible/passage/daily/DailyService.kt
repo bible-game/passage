@@ -23,15 +23,20 @@ class DailyService(
 
     /** Generates today's bible passage and retrieves it from storage */
     fun retrievePassage(): Passage {
-        if (cache == null) {
-            log.debug("No cached passage! Searching database for today's entry")
-            val today = passageRepository.findToday()
+        log.debug("No cached passage! Searching database for today's entry")
+        val today = passageRepository.findToday()
 
-            cache = if (today.isPresent) today.get()
-                        else generatePassage()
-        }
+        return if (today.isPresent) today.get() else generatePassage()
 
-        return cache!!
+//        if (cache == null) {
+//            log.debug("No cached passage! Searching database for today's entry")
+//            val today = passageRepository.findToday()
+//
+//            cache = if (today.isPresent) today.get()
+//                        else generatePassage()
+//        }
+//
+//        return cache!!
     }
 
     private fun generatePassage(): Passage {
