@@ -28,7 +28,7 @@ class GuessService(
     }
 
     private fun calculateCloseness(guess: Pair<String, String>, answer: Passage): Int {
-        val totalVerses = 475 // 31_102
+        val totalVerses = 639 // 31_102
         // Question :: should revelation be ~0% not 60%?
         var verseDistance = 0
         var altDistance = 0
