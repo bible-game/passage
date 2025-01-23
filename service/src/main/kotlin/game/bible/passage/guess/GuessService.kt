@@ -28,7 +28,7 @@ class GuessService(
     }
 
     private fun calculateCloseness(guess: Pair<String, String>, answer: Passage): Int {
-        val totalVerses = 1951 // 31_102
+        val totalVerses = 2196 // 31_102
         // Question :: should revelation be ~0% not 60%?
         var verseDistance = 0
         var altDistance = 0
@@ -49,15 +49,19 @@ class GuessService(
             }
         }
 
-        for (book in altList) {
-            book.getChapters()!!.forEach { chapter ->
-                altDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
-            }
-        }
+        // Question :: apply wrap for stars only?
+//        for (book in altList) {
+//            book.getChapters()!!.forEach { chapter ->
+//                altDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
+//            }
+//        }
+//
+//        if (altDistance > verseDistance) verseDistance = altDistance
 
-        if (altDistance > verseDistance) verseDistance = altDistance
 
-        return (verseDistance * 100 / totalVerses)
+//        return (verseDistance * 100 / totalVerses)
+
+        return ((totalVerses - verseDistance) * 100 / totalVerses)
     }
 
 }
