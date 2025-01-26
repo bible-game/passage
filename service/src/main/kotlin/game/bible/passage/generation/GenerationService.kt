@@ -7,7 +7,6 @@ import game.bible.config.model.integration.BibleApiConfig
 import game.bible.passage.Passage
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
-import kotlin.random.Random
 
 /**
  * Passage Generation Service Logic

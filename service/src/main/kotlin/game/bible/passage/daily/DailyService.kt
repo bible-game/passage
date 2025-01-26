@@ -5,6 +5,8 @@ import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
 import game.bible.passage.generation.GenerationService
 import org.springframework.stereotype.Service
+import java.text.SimpleDateFormat
+import java.util.Date
 
 /**
  * Daily Passage Service Logic
@@ -19,24 +21,23 @@ class DailyService(
 ) {
 
     companion object : Log()
-    private var cache: Passage? = null
+    private var date: String = ""
+    private var cache: Pair<Passage?, String> = Pair(null, "")
 
     /** Generates today's bible passage and retrieves it from storage */
     fun retrievePassage(): Passage {
-        log.debug("No cached passage! Searching database for today's entry")
-        val today = passageRepository.findToday()
+        date = SimpleDateFormat("dd-MM-yyyy").format(Date())
 
-        return if (today.isPresent) today.get() else generatePassage()
+        if (cache.isInvalid()) {
+            log.debug("Invalid cache! Searching database for today's entry")
+            val entry = passageRepository.findToday()
 
-//        if (cache == null) {
-//            log.debug("No cached passage! Searching database for today's entry")
-//            val today = passageRepository.findToday()
-//
-//            cache = if (today.isPresent) today.get()
-//                        else generatePassage()
-//        }
-//
-//        return cache!!
+            val passage = if (entry.isPresent) entry.get() else generatePassage()
+            cache = Pair(passage, date)
+
+        }
+
+        return cache.first!!
     }
 
     private fun generatePassage(): Passage {
@@ -44,6 +45,13 @@ class DailyService(
         val randomPassage = generator.random()
 
         return passageRepository.save(randomPassage)
+    }
+
+    private fun Pair<Passage?, String>.isInvalid(): Boolean {
+        val valid = this.first == null || this.second != date
+        log.debug("Validity of cache determined to be $valid")
+
+        return valid
     }
 
 }
