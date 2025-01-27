@@ -2,4 +2,4 @@
 [![gradle](https://img.shields.io/badge/Gradle-02303A?&logo=Gradle&logoColor=white)](https://docs.gradle.org/current/userguide/userguide.html)
 [![kotlin](https://img.shields.io/badge/Kotlin-B125EA?&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 # passage
-The BLE Passage Service (passage)
+The BLE Text Service (passage)

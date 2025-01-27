@@ -1,3 +1,5 @@
+cors:
+  originPatterns: "http://localhost:3000"
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/passage-db
