@@ -1,7 +1,7 @@
 package game.bible.passage.config
 
 import game.bible.config.ReloadableConfig
-import game.bible.config.model.integration.BibleApiConfiguration
+import game.bible.config.model.integration.BibleApiConfig
 import game.bible.config.model.service.PassageConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient
 @Import(
     ReloadableConfig::class,
     PassageConfig::class,
-    BibleApiConfiguration::class)
+    BibleApiConfig::class)
 class Beans {
 
     @Bean
