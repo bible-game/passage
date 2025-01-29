@@ -2,6 +2,7 @@ package game.bible.passage.generation
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import game.bible.common.util.log.Log
 import game.bible.config.model.domain.BibleConfig
 import game.bible.config.model.integration.BibleApiConfig
 import game.bible.passage.Passage
@@ -19,29 +20,32 @@ import java.util.Date
 class GenerationService(
     private val api: BibleApiConfig,
     private val bible: BibleConfig,
+    // chat: ChatGptConfig
     private val mapper: ObjectMapper,
     private val restClient: RestClient
 ) {
 
+    companion object : Log()
+
     /** Generates a random bible passage */
     fun random(date: Date): Passage {
-        // Which book?
-        val random = bible.getBooks()!!.random()
-        val book = random.getBook()!!
+        val testament = bible.getTestaments()!!.random()
 
-        // Which chapter?
-        val passage = random.getChapters()!!.random()
-        val chapter = passage.getChapter()!!
-        val title = passage.getTitle()!!
-        val verseEnd = passage.getVerseEnd()!!
+        val division = testament.getDivisions()!!.random()
+        val book = division.getBooks()!!.random()
+        val bookName = book.getName()!!
+        val chapter = "${(1..book.getChapters()!!).random()}"
 
-        val text = fetchText("$book+$chapter")
+        val text = fetchText("${book.getName()!!}+$chapter")
 
-        return Passage(book, chapter, title, "", verseEnd, date, text)
+        // TODO :: summary from chatGPT
+
+
+        return Passage(date, bookName, chapter, "", "", 1, text)
     }
 
-    /** Fetches the text for generated passage */
-    fun fetchText(passageId: String): String {
+    private fun fetchText(passageId: String): String {
+        log.debug("Attempting to fetch text for {}", passageId)
         val url = "${api.getBaseUrl()}/$passageId"
 
         val response = restClient.get()
@@ -51,5 +55,7 @@ class GenerationService(
         val jsonNode: JsonNode = mapper.readTree(response)
         return jsonNode["text"].asText()
     }
+
+    // private fub summarise(text)
 
 }

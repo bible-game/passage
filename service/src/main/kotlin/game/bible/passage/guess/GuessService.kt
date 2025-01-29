@@ -27,41 +27,41 @@ class GuessService(
         return 0
     }
 
-    private fun calculateCloseness(guess: Pair<String, String>, answer: Passage): Int {
-        val totalVerses = 2196 // 31_102
-        // Question :: should revelation be ~0% not 60%?
-        var verseDistance = 0
-        var altDistance = 0
-
-        val books = bibleConfig.getBooks()!!
-        val guessIndex = books.indexOfFirst { it.getBook() == guess.first }
-        val answerIndex = books.indexOfFirst { it.getBook() == answer.book }
-
-        val lower = if (guessIndex <= answerIndex) guessIndex else answerIndex
-        val upper = if (guessIndex <= answerIndex) answerIndex else guessIndex
-
-        val bookList = books.subList(lower, upper)
-        val altList = books.filterNot { it in bookList }
-
-        for (book in bookList) {
-            book.getChapters()!!.forEach { chapter ->
-                verseDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
-            }
-        }
-
-        // Question :: apply wrap for stars only?
-//        for (book in altList) {
+//    private fun calculateCloseness(guess: Pair<String, String>, answer: Passage): Int {
+//        val totalVerses = 2196 // 31_102
+//        // Question :: should revelation be ~0% not 60%?
+//        var verseDistance = 0
+//        var altDistance = 0
+//
+//        val books = bibleConfig.getBooks()!!
+//        val guessIndex = books.indexOfFirst { it.getBook() == guess.first }
+//        val answerIndex = books.indexOfFirst { it.getBook() == answer.book }
+//
+//        val lower = if (guessIndex <= answerIndex) guessIndex else answerIndex
+//        val upper = if (guessIndex <= answerIndex) answerIndex else guessIndex
+//
+//        val bookList = books.subList(lower, upper)
+//        val altList = books.filterNot { it in bookList }
+//
+//        for (book in bookList) {
 //            book.getChapters()!!.forEach { chapter ->
-//                altDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
+//                verseDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
 //            }
 //        }
 //
-//        if (altDistance > verseDistance) verseDistance = altDistance
-
-
-//        return (verseDistance * 100 / totalVerses)
-
-        return ((totalVerses - verseDistance) * 100 / totalVerses)
-    }
+//        // Question :: apply wrap for stars only?
+////        for (book in altList) {
+////            book.getChapters()!!.forEach { chapter ->
+////                altDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
+////            }
+////        }
+////
+////        if (altDistance > verseDistance) verseDistance = altDistance
+//
+//
+////        return (verseDistance * 100 / totalVerses)
+//
+//        return ((totalVerses - verseDistance) * 100 / totalVerses)
+//    }
 
 }

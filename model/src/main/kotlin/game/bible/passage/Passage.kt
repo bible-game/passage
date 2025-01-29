@@ -17,7 +17,7 @@ import java.util.Date
 data class Passage(
     val date: Date = Date(),
     val book: String = "",
-    val chapter: Int = 0,
+    val chapter: String = "",
     val title: String = "",
     val summary: String = "",
     val verses: Int = 0,
