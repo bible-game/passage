@@ -7,6 +7,7 @@ import game.bible.config.model.integration.BibleApiConfig
 import game.bible.passage.Passage
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
+import java.util.Date
 
 /**
  * Passage Generation Service Logic
@@ -23,21 +24,20 @@ class GenerationService(
 ) {
 
     /** Generates a random bible passage */
-    fun random(): Passage {
+    fun random(date: Date): Passage {
         // Which book?
         val random = bible.getBooks()!!.random()
         val book = random.getBook()!!
 
-        // Which passage?
+        // Which chapter?
         val passage = random.getChapters()!!.random()
         val chapter = passage.getChapter()!!
         val title = passage.getTitle()!!
-        val verseStart = passage.getVerseStart()!!
         val verseEnd = passage.getVerseEnd()!!
 
-        val text = fetchText("$book+$chapter:$verseStart-$verseEnd")
+        val text = fetchText("$book+$chapter")
 
-        return Passage(book, chapter, title, verseStart, verseEnd, text)
+        return Passage(book, chapter, title, "", verseEnd, date, text)
     }
 
     /** Fetches the text for generated passage */

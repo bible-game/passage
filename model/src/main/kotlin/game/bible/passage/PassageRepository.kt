@@ -1,8 +1,8 @@
 package game.bible.passage
 
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import java.util.Date
 import java.util.Optional
 
 /**
@@ -14,10 +14,6 @@ import java.util.Optional
 @Repository
 interface PassageRepository : JpaRepository<Passage, Long> {
 
-    @Query(
-        "SELECT p FROM Passage p " +
-        "WHERE p.createdDate >= current_date " +
-        "ORDER BY p.createdDate ASC LIMIT 1")
-    fun findToday(): Optional<Passage>
+    fun findByDate(date: Date): Optional<Passage>
 
 }

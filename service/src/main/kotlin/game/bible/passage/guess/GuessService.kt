@@ -19,12 +19,12 @@ class GuessService(
 ) {
 
     fun evaluate(guess: Pair<String, String>): Int {
-        val today = passageRepository.findToday().getOrNull()!! // todo :: if null, throw Ex (code? 400?)
+//        val today = passageRepository.findByDate().getOrNull()!! // todo :: if null, throw Ex (code? 400?)
 
-        val correct = (today.book == guess.first && today.title == guess.second)
-        val closeness = if (correct) 100 else calculateCloseness(guess, today)
+//        val correct = (today.book == guess.first && today.title == guess.second)
+//        val closeness = if (correct) 100 else calculateCloseness(guess, today)
 
-        return closeness
+        return 0
     }
 
     private fun calculateCloseness(guess: Pair<String, String>, answer: Passage): Int {
