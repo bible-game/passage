@@ -1,11 +1,13 @@
 package game.bible.passage.daily
 
-import game.bible.common.util.log.Log
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
 import game.bible.passage.generation.GenerationService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.util.Date
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Daily Passage Service Logic
@@ -16,10 +18,7 @@ import java.util.Date
 @Service
 class DailyService(
     private val generator: GenerationService,
-    private val passageRepository: PassageRepository
-) {
-
-    companion object : Log()
+    private val passageRepository: PassageRepository) {
 
     /** Generates a bible passage and retrieves it from storage */
     fun retrievePassage(date: Date): Passage {
@@ -32,7 +31,7 @@ class DailyService(
     }
 
     private fun generatePassage(date: Date): Passage {
-        log.debug("No entry exists for [{}]! Generating random passage", date)
+        log.info { "No entry exists for [$date]! Generating random passage" }
         val randomPassage = generator.random(date)
 
         return passageRepository.save(randomPassage)
