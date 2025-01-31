@@ -1,11 +1,13 @@
 package game.bible.passage.guess
 
 import game.bible.config.model.domain.BibleConfig
+import game.bible.config.model.domain.BibleConfig.BibleTestamentConfig.BibleDivisionConfig.BibleBookConfig
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Date
 import kotlin.jvm.optionals.getOrNull
+import kotlin.math.floor
 
 /**
  * Guess-related Service Logic
@@ -15,7 +17,7 @@ import kotlin.jvm.optionals.getOrNull
  */
 @Service
 class GuessService(
-    private val bibleConfig: BibleConfig,
+    private val bible: BibleConfig,
     private val passageRepository: PassageRepository
 ) {
 
@@ -29,41 +31,35 @@ class GuessService(
     }
 
     private fun calculateCloseness(answer: Passage, guess: Pair<String, String>): Int {
-        return 0
-//        val totalVerses = 2196 // 31_102
-//        // Question :: should revelation be ~0% not 60%?
-//        var verseDistance = 0
-//        var altDistance = 0
-//
-//        val books = bibleConfig.getBooks()!!
-//        val guessIndex = books.indexOfFirst { it.getBook() == guess.first }
-//        val answerIndex = books.indexOfFirst { it.getBook() == answer.book }
-//
-//        val lower = if (guessIndex <= answerIndex) guessIndex else answerIndex
-//        val upper = if (guessIndex <= answerIndex) answerIndex else guessIndex
-//
-//        val bookList = books.subList(lower, upper)
-//        val altList = books.filterNot { it in bookList }
-//
-//        for (book in bookList) {
-//            book.getChapters()!!.forEach { chapter ->
-//                verseDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
-//            }
-//        }
-//
-//        // Question :: apply wrap for stars only?
-////        for (book in altList) {
-////            book.getChapters()!!.forEach { chapter ->
-////                altDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
-////            }
-////        }
-////
-////        if (altDistance > verseDistance) verseDistance = altDistance
-//
-//
-////        return (verseDistance * 100 / totalVerses)
-//
-//        return ((totalVerses - verseDistance) * 100 / totalVerses)
+        val totalVerses = 31_102
+        var verseDistance = 0
+
+        val books = mutableListOf<BibleBookConfig>()
+        for (testaments in bible.getTestaments()!!) {
+            for (division in testaments.getDivisions()!!) {
+                for (book in division.getBooks()!!) {
+                    books.add(book)
+                }
+            }
+        }
+
+        val guessIndex = books.indexOfFirst { it.getName() == guess.first }
+        val answerIndex = books.indexOfFirst { it.getName() == answer.book }
+
+        val lower = if (guessIndex <= answerIndex) guessIndex else answerIndex
+        val upper = if (guessIndex <= answerIndex) answerIndex else guessIndex
+
+        val bookList = books.subList(lower, upper)
+
+        // TODO :: need to rethink (start and end chapter / selecting the correct book).. figure it our again
+        // add color to UI too...
+        for (book in bookList) {
+            for (i in 0..<book.getChapters()!!) {
+                verseDistance += book.getVerses()!![i]
+            }
+        }
+
+        return floor((100.0 * (totalVerses - verseDistance)) / totalVerses).toInt()
     }
 
 }
