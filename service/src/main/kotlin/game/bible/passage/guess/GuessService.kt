@@ -4,6 +4,7 @@ import game.bible.config.model.domain.BibleConfig
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
 import org.springframework.stereotype.Service
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 /**
@@ -18,16 +19,17 @@ class GuessService(
     private val passageRepository: PassageRepository
 ) {
 
-    fun evaluate(guess: Pair<String, String>): Int {
-//        val today = passageRepository.findByDate().getOrNull()!! // todo :: if null, throw Ex (code? 400?)
+    fun evaluate(date: Date, guess: Pair<String, String>): Int {
+        val answer = passageRepository.findByDate(date).getOrNull()!! // todo :: if null, throw Ex (code? 400?)
 
-//        val correct = (today.book == guess.first && today.title == guess.second)
-//        val closeness = if (correct) 100 else calculateCloseness(guess, today)
+        val correct = (answer.book == guess.first && answer.chapter == guess.second)
+        val closeness = if (correct) 100 else calculateCloseness(answer, guess)
 
-        return 0
+        return closeness
     }
 
-//    private fun calculateCloseness(guess: Pair<String, String>, answer: Passage): Int {
+    private fun calculateCloseness(answer: Passage, guess: Pair<String, String>): Int {
+        return 0
 //        val totalVerses = 2196 // 31_102
 //        // Question :: should revelation be ~0% not 60%?
 //        var verseDistance = 0
@@ -62,6 +64,6 @@ class GuessService(
 ////        return (verseDistance * 100 / totalVerses)
 //
 //        return ((totalVerses - verseDistance) * 100 / totalVerses)
-//    }
+    }
 
 }
