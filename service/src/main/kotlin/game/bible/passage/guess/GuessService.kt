@@ -3,10 +3,12 @@ package game.bible.passage.guess
 import game.bible.config.model.domain.BibleConfig
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
-import java.util.Date
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.floor
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Guess-related Service Logic
@@ -35,20 +37,22 @@ class GuessService(
         }
     }
 
-    fun evaluate(date: Date, guess: Pair<String, String>): Int {
-        val answer = passageRepository.findByDate(date).getOrNull()!!
+    fun evaluate(guess: Guess): Closeness {
+        val answer = passageRepository.findByDate(guess.date).getOrNull()!!
         // todo :: if null, throw Ex (code? 400?)
 
-        val correct = (answer.book == guess.first && answer.chapter == guess.second)
-        val closeness = if (correct) 0 else calculateCloseness(answer, guess)
+        val correct = (answer.book == guess.book && answer.chapter == guess.chapter)
+        val closeness = if (correct) Closeness(0, 100)
+                        else calculateCloseness(answer, guess)
 
         return closeness
     }
 
-    private fun calculateCloseness(answer: Passage, guess: Pair<String, String>): Int {
+    private fun calculateCloseness(answer: Passage, guess: Guess): Closeness {
+        val totalVerses = 31_102
         var verseDistance = 0
 
-        val guessIndex = verseMap.keys.indexOf("${guess.first}${guess.second}")
+        val guessIndex = verseMap.keys.indexOf("${guess.book}${guess.chapter}")
         val answerIndex = verseMap.keys.indexOf("${answer.book}${answer.chapter}")
 
         val lower = if (guessIndex <= answerIndex) guessIndex else answerIndex
@@ -60,7 +64,8 @@ class GuessService(
             verseDistance += verseMap[chapter]!!
         }
 
-        return verseDistance
+        val percentage = 100.0 * (totalVerses - verseDistance) / totalVerses
+        return Closeness(verseDistance, floor(percentage).toInt())
     }
 
 }

@@ -1,8 +1,6 @@
 package game.bible.passage.guess
 
-import game.bible.common.util.log.Log
-import game.bible.passage.Passage
-import game.bible.passage.daily.DailyService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -10,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.Date
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Exposes Guess-related Actions
@@ -21,8 +21,6 @@ import java.util.Date
 @RequestMapping("/guess")
 class GuessController(private val service: GuessService) {
 
-    companion object : Log()
-
     /** Returns guess 'closeness' for a given passage */
     @GetMapping("/{date}/{book}/{chapter}")
     fun getCloseness(
@@ -30,8 +28,8 @@ class GuessController(private val service: GuessService) {
         @PathVariable book: String, @PathVariable chapter: String
     ): ResponseEntity<Any> { // Implement custom response object
         return try {
-            val guess = Pair(book, chapter)
-            val response: Int = service.evaluate(date, guess)
+            val guess = Guess(date, book, chapter)
+            val response: Closeness = service.evaluate(guess)
             ResponseEntity.ok(response)
 
         } catch (e: Exception) {
