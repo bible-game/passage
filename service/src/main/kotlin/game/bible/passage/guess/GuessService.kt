@@ -40,13 +40,12 @@ class GuessService(
         // todo :: if null, throw Ex (code? 400?)
 
         val correct = (answer.book == guess.first && answer.chapter == guess.second)
-        val closeness = if (correct) 100 else calculateCloseness(answer, guess)
+        val closeness = if (correct) 0 else calculateCloseness(answer, guess)
 
         return closeness
     }
 
     private fun calculateCloseness(answer: Passage, guess: Pair<String, String>): Int {
-        val totalVerses = 31_102
         var verseDistance = 0
 
         val guessIndex = verseMap.keys.indexOf("${guess.first}${guess.second}")
@@ -61,7 +60,7 @@ class GuessService(
             verseDistance += verseMap[chapter]!!
         }
 
-        return floor((100.0 * (totalVerses - verseDistance)) / totalVerses).toInt()
+        return verseDistance
     }
 
 }
