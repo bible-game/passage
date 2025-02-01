@@ -61,6 +61,8 @@ class GenerationService(
     }
 
      private fun summarise(text: String): String {
+         log.info { "Asking ChatGPT for text summary [${text.substring(0, 20)}...]" }
+
          val createParams = ChatCompletionCreateParams.builder()
              .model(ChatModel.GPT_4O_MINI)
              .maxCompletionTokens(2048)
