@@ -30,6 +30,13 @@ class DailyService(
         } else generatePassage(date)
     }
 
+    /** Retrieves paginated list of previous game dates */
+    fun retrieveDates(page: Int): List<Date> {
+        val passages = passageRepository.findAll()
+
+        return passages.map { it.date }
+    }
+
     private fun generatePassage(date: Date): Passage {
         log.info { "No entry exists for [$date]! Generating random passage" }
         val randomPassage = generator.random(date)
