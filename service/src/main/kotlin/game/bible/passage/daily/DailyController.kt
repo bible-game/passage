@@ -38,9 +38,9 @@ class DailyController(private val service: DailyService) {
         }
     }
 
-    /** Returns the dates of previously played games */
-    @GetMapping("/previous")
-    fun getPreviousDates(@RequestParam(defaultValue = "0") page: Int): ResponseEntity<Any> {
+    /** Returns the dates of historic games */
+    @GetMapping("/history")
+    fun getHistory(@RequestParam(defaultValue = "0") page: Int): ResponseEntity<Any> {
         return try {
             log.info { "Request for previous game dates [page: $page]" }
 

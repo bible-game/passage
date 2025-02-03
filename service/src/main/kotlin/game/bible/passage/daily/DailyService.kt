@@ -30,9 +30,13 @@ class DailyService(
         } else generatePassage(date)
     }
 
-    /** Retrieves paginated list of previous game dates */
+    /** Retrieves paginated list of historic game dates */
     fun retrieveDates(page: Int): List<Date> {
         val passages = passageRepository.findAll()
+        // TODO :: just return last and any in range (today) that are missing... no need for pagination
+        // min ""
+        // missing: ["", ...]
+        // max: <<TODAY>>
 
         return passages.map { it.date }
     }
