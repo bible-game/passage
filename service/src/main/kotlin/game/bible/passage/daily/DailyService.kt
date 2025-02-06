@@ -6,7 +6,7 @@ import game.bible.passage.generation.GenerationService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 
 
 private val log = KotlinLogging.logger {}
@@ -34,7 +34,7 @@ class DailyService(
         } else generatePassage(date)
     }
 
-    /** Retrieves paginated list of historic game dates */
+    /** Retrieves paginated list of historic daily passage */
     fun retrieveDates(page: Int): List<String> {
         val passages = passageRepository.findAll()
         // TODO :: for a logged in user, return paginated results of all dates (attempted [color?], won [star?], not-attempted [question mark?])
