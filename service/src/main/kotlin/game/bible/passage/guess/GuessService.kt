@@ -3,8 +3,12 @@ package game.bible.passage.guess
 import game.bible.config.model.domain.BibleConfig
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
+import kotlin.math.floor
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Guess-related Service Logic
@@ -14,54 +18,54 @@ import kotlin.jvm.optionals.getOrNull
  */
 @Service
 class GuessService(
-    private val bibleConfig: BibleConfig,
+    bible: BibleConfig,
     private val passageRepository: PassageRepository
 ) {
 
-    fun evaluate(guess: Pair<String, String>): Int {
-        val today = passageRepository.findToday().getOrNull()!! // todo :: if null, throw Ex (code? 400?)
+    private var verseMap: MutableMap<String, Int> = mutableMapOf()
 
-        val correct = (today.book == guess.first && today.title == guess.second)
-        val closeness = if (correct) 100 else calculateCloseness(guess, today)
+    init {
+        for (test in bible.getTestaments()!!) {
+            for (div in test.getDivisions()!!) {
+                for (book in div.getBooks()!!) {
+                    val verses = book.getVerses()!!
+                    for (chapter in 1..book.getChapters()!!) {
+                        verseMap["${book.getName()}${chapter}"] = verses[chapter - 1]
+                    }
+                }
+            }
+        }
+    }
+
+    fun evaluate(guess: Guess): Closeness {
+        val answer = passageRepository.findByDate(guess.date).getOrNull()!!
+        // todo :: if null, throw Ex (code? 400?)
+
+        val correct = (answer.book == guess.book && answer.chapter == guess.chapter)
+        val closeness = if (correct) Closeness(0, 100)
+                        else calculateCloseness(answer, guess)
 
         return closeness
     }
 
-    private fun calculateCloseness(guess: Pair<String, String>, answer: Passage): Int {
-        val totalVerses = 2196 // 31_102
-        // Question :: should revelation be ~0% not 60%?
+    private fun calculateCloseness(answer: Passage, guess: Guess): Closeness {
+        val totalVerses = 31_102
         var verseDistance = 0
-        var altDistance = 0
 
-        val books = bibleConfig.getBooks()!!
-        val guessIndex = books.indexOfFirst { it.getBook() == guess.first }
-        val answerIndex = books.indexOfFirst { it.getBook() == answer.book }
+        val guessIndex = verseMap.keys.indexOf("${guess.book}${guess.chapter}")
+        val answerIndex = verseMap.keys.indexOf("${answer.book}${answer.chapter}")
 
         val lower = if (guessIndex <= answerIndex) guessIndex else answerIndex
         val upper = if (guessIndex <= answerIndex) answerIndex else guessIndex
 
-        val bookList = books.subList(lower, upper)
-        val altList = books.filterNot { it in bookList }
+        val chapters = verseMap.keys.toList().subList(lower, upper)
 
-        for (book in bookList) {
-            book.getChapters()!!.forEach { chapter ->
-                verseDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
-            }
+        for (chapter in chapters) {
+            verseDistance += verseMap[chapter]!!
         }
 
-        // Question :: apply wrap for stars only?
-//        for (book in altList) {
-//            book.getChapters()!!.forEach { chapter ->
-//                altDistance += chapter.getVerseEnd()!! - chapter.getVerseStart()!!
-//            }
-//        }
-//
-//        if (altDistance > verseDistance) verseDistance = altDistance
-
-
-//        return (verseDistance * 100 / totalVerses)
-
-        return ((totalVerses - verseDistance) * 100 / totalVerses)
+        val percentage = 100.0 * (totalVerses - verseDistance) / totalVerses
+        return Closeness(verseDistance, floor(percentage).toInt())
     }
 
 }

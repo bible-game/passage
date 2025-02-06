@@ -4,6 +4,7 @@ import game.bible.common.model.BaseEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
+import java.util.Date
 
 /**
  * Passage Model
@@ -14,11 +15,12 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "passage")
 data class Passage(
+    val date: Date = Date(),
     val book: String = "",
-    val chapter: Int = 0,
+    val chapter: String = "",
     val title: String = "",
-    val verseStart: Int = 0,
-    val verseEnd: Int = 0,
+    val summary: String = "",
+    val verses: Int = 0,
 
     @Column(columnDefinition="TEXT")
     val text: String = ""
