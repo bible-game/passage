@@ -1,12 +1,15 @@
 package game.bible.passage.daily
 
-import game.bible.common.util.log.Log
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
 import game.bible.passage.generation.GenerationService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.util.Date
+
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Daily Passage Service Logic
@@ -17,41 +20,35 @@ import java.util.Date
 @Service
 class DailyService(
     private val generator: GenerationService,
-    private val passageRepository: PassageRepository
-) {
+    private val passageRepository: PassageRepository) {
 
-    companion object : Log()
-    private var date: String = ""
-    private var cache: Pair<Passage?, String> = Pair(null, "")
+    private var date: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
 
-    /** Generates today's bible passage and retrieves it from storage */
-    fun retrievePassage(): Passage {
-        date = SimpleDateFormat("dd-MM-yyyy").format(Date())
+    /** Generates a bible passage and retrieves it from storage */
+    fun retrievePassage(date: Date): Passage {
+        val entry = passageRepository.findByDate(date)
 
-        if (cache.isInvalid()) {
-            log.debug("Invalid cache! Searching database for today's entry")
-            val entry = passageRepository.findToday()
+        return if (entry.isPresent) {
+            entry.get()
 
-            val passage = if (entry.isPresent) entry.get() else generatePassage()
-            cache = Pair(passage, date)
-
-        }
-
-        return cache.first!!
+        } else generatePassage(date)
     }
 
-    private fun generatePassage(): Passage {
-        log.debug("No entry exists for today! Generating random passage")
-        val randomPassage = generator.random()
+    /** Retrieves paginated list of historic daily passage */
+    fun retrieveDates(page: Int): List<String> {
+        val passages = passageRepository.findAll()
+        // TODO :: for a logged in user, return paginated results of all dates (attempted [color?], won [star?], not-attempted [question mark?])
+        // for non-logged in user, just return all existing dates (paginate as required)
+        // pagination -> pull back a month at a time!
+
+        return passages.map { date.format(it.date) }
+    }
+
+    private fun generatePassage(date: Date): Passage {
+        log.info { "No entry exists for [$date]! Generating random passage" }
+        val randomPassage = generator.random(date)
 
         return passageRepository.save(randomPassage)
-    }
-
-    private fun Pair<Passage?, String>.isInvalid(): Boolean {
-        val valid = this.first == null || this.second != date
-        log.debug("Validity of cache determined to be $valid")
-
-        return valid
     }
 
 }

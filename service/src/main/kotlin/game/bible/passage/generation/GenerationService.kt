@@ -2,11 +2,20 @@ package game.bible.passage.generation
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.openai.client.OpenAIClient
+import com.openai.models.ChatCompletion
+import com.openai.models.ChatCompletionCreateParams
+import com.openai.models.ChatModel
 import game.bible.config.model.domain.BibleConfig
 import game.bible.config.model.integration.BibleApiConfig
+import game.bible.config.model.integration.ChatGptConfig
 import game.bible.passage.Passage
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
+import java.util.Date
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Passage Generation Service Logic
@@ -18,30 +27,29 @@ import org.springframework.web.client.RestClient
 class GenerationService(
     private val api: BibleApiConfig,
     private val bible: BibleConfig,
+    private val chat: ChatGptConfig,
+    private val client: OpenAIClient,
     private val mapper: ObjectMapper,
     private val restClient: RestClient
 ) {
 
     /** Generates a random bible passage */
-    fun random(): Passage {
-        // Which book?
-        val random = bible.getBooks()!!.random()
-        val book = random.getBook()!!
+    fun random(date: Date): Passage {
+        val testament = bible.getTestaments()!!.random()
 
-        // Which passage?
-        val passage = random.getChapters()!!.random()
-        val chapter = passage.getChapter()!!
-        val title = passage.getTitle()!!
-        val verseStart = passage.getVerseStart()!!
-        val verseEnd = passage.getVerseEnd()!!
+        val division = testament.getDivisions()!!.random()
+        val book = division.getBooks()!!.random()
+        val chapter = "${(1..book.getChapters()!!).random()}"
+        val verses = book.getVerses()!![chapter.toInt().plus(1)]
 
-        val text = fetchText("$book+$chapter:$verseStart-$verseEnd")
+        val text = fetchText("${book.getKey()!!}+$chapter")
+        val summary = summarise(text)
 
-        return Passage(book, chapter, title, verseStart, verseEnd, text)
+        return Passage(date, book.getName()!!, chapter, "", summary, verses, text)
     }
 
-    /** Fetches the text for generated passage */
-    fun fetchText(passageId: String): String {
+    private fun fetchText(passageId: String): String {
+        log.info { "Attempting to fetch text for $passageId" }
         val url = "${api.getBaseUrl()}/$passageId"
 
         val response = restClient.get()
@@ -51,5 +59,23 @@ class GenerationService(
         val jsonNode: JsonNode = mapper.readTree(response)
         return jsonNode["text"].asText()
     }
+
+     private fun summarise(text: String): String {
+         log.info { "Asking ChatGPT for text summary [${text.substring(0, 20)}...]" }
+
+         val createParams = ChatCompletionCreateParams.builder()
+             .model(ChatModel.GPT_4O_MINI)
+             .maxCompletionTokens(2048)
+             .addDeveloperMessage(chat.getPromptDeveloper()!!)
+             .addUserMessage(chat.getPromptUser()!! + text)
+             .build()
+
+         var summary = ""
+         client.chat().completions().create(createParams).choices().stream()
+             .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
+             .forEach { x: String? -> summary += x }
+
+         return summary
+     }
 
 }
