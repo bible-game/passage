@@ -40,7 +40,7 @@ class GenerationService(
         val division = testament.getDivisions()!!.random()
         val book = division.getBooks()!!.random()
         val chapter = "${(1..book.getChapters()!!).random()}"
-        val verses = book.getVerses()!![chapter.toInt().plus(1)]
+        val verses = book.getVerses()!![chapter.toInt()]
 
         val text = fetchText("${book.getKey()!!}+$chapter")
         val summary = summarise(text)
