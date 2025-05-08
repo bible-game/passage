@@ -11,3 +11,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update # update # create
+
+application:
+  config:
+    dir: ${BLE_CONFIG:/etc/secrets}
