@@ -7,8 +7,6 @@ import java.util.Optional
 
 /**
  * Passage Data Access
- *
- * @author J. R. Smith
  * @since 9th December 2024
  */
 @Repository
