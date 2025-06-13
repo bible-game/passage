@@ -49,6 +49,11 @@ subprojects {
         implementation(rootProject.libs.bundles.spring)
         implementation(rootProject.libs.bundles.test)
     }
+
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
 }
 
 tasks.register("printTagVersion") {
