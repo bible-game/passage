@@ -45,7 +45,9 @@ class GenerationService(
         val text = fetchText("${book.getKey()!!}+$chapter")
         val summary = summarise(text)
 
-        return Passage(date, book.getName()!!, chapter, "", summary, verses, text)
+        val icon = book.getIcons()!![chapter.toInt()]
+
+        return Passage(date, book.getName()!!, chapter, "", summary, verses, icon, text)
     }
 
     private fun fetchText(passageId: String): String {
