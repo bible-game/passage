@@ -2,7 +2,7 @@ cors:
   originPatterns: "http://localhost:3000,http://localhost:4200"
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/passage-db
+    url: jdbc:postgresql://localhost:5432/bible_db
     username: admin
     password: root
     driverClassName: org.postgresql.Driver
