@@ -21,6 +21,7 @@ data class Passage(
     val title: String = "",
     val summary: String = "",
     val verses: Int = 0,
+    val icon: String = "",
 
     @Column(columnDefinition="TEXT")
     val text: String = ""
