@@ -40,12 +40,14 @@ class GenerationService(
         val division = testament.getDivisions()!!.random()
         val book = division.getBooks()!!.random()
         val chapter = "${(1..book.getChapters()!!).random()}"
-        val verses = book.getVerses()!![chapter.toInt()]
+        val verses = book.getVerses()!![chapter.toInt() - 1]
 
         val text = fetchText("${book.getKey()!!}+$chapter")
         val summary = summarise(text)
 
-        return Passage(date, book.getName()!!, chapter, "", summary, verses, text)
+        val icon = book.getIcons()!![chapter.toInt() - 1]
+
+        return Passage(date, book.getName()!!, chapter, "", summary, verses, icon, text)
     }
 
     private fun fetchText(passageId: String): String {

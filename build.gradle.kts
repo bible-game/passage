@@ -40,7 +40,8 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     dependencies {
-        implementation(rootProject.libs.bundles.app)
+        implementation(rootProject.libs.bundles.common)
+        implementation(rootProject.libs.bundles.config)
         implementation(rootProject.libs.bundles.core)
         implementation(rootProject.libs.bundles.data)
         implementation(rootProject.libs.bundles.database)
