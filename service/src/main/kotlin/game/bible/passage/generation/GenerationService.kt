@@ -10,6 +10,7 @@ import game.bible.config.model.domain.BibleConfig
 import game.bible.config.model.integration.BibleApiConfig
 import game.bible.config.model.integration.ChatGptConfig
 import game.bible.passage.Passage
+import game.bible.passage.context.PreContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
@@ -20,7 +21,6 @@ private val log = KotlinLogging.logger {}
 /**
  * Passage Generation Service Logic
  *
- * @author J. R. Smith
  * @since 13th January 2025
  */
 @Service
@@ -50,6 +50,21 @@ class GenerationService(
         return Passage(date, book.getName()!!, chapter, "", summary, verses, icon, text)
     }
 
+    /** Generates the context leading up to a given passage */
+    fun preContext(passageKey: String): PreContext {
+        log.info { "Asking ChatGPT for pre-context [$passageKey]" }
+
+        val devPrompt: String = chat.getContext()!!.getPromptDeveloper()!!
+        val userPrompt: String = chat.getContext()!!.getPromptUser()!! + passageKey
+
+        var context = ""
+        client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
+            .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
+            .forEach { x: String? -> context += x }
+
+        return PreContext(passageKey, context)
+    }
+
     private fun fetchText(passageId: String): String {
         log.info { "Attempting to fetch text for $passageId" }
         val url = "${api.getBaseUrl()}/$passageId"
@@ -65,19 +80,24 @@ class GenerationService(
      private fun summarise(text: String): String {
          log.info { "Asking ChatGPT for text summary [${text.substring(0, 20)}...]" }
 
-         val createParams = ChatCompletionCreateParams.builder()
-             .model(ChatModel.GPT_4O_MINI)
-             .maxCompletionTokens(2048)
-             .addDeveloperMessage(chat.getPromptDeveloper()!!)
-             .addUserMessage(chat.getPromptUser()!! + text)
-             .build()
+         val devPrompt: String = chat.getDaily()!!.getPromptDeveloper()!!
+         val userPrompt: String = chat.getDaily()!!.getPromptUser()!! + text
 
          var summary = ""
-         client.chat().completions().create(createParams).choices().stream()
+         client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
              .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
              .forEach { x: String? -> summary += x }
 
          return summary
      }
+
+    private fun createParams(devPrompt: String, userPrompt: String): ChatCompletionCreateParams{
+        return ChatCompletionCreateParams.builder()
+            .model(ChatModel.GPT_4O_MINI)
+            .maxCompletionTokens(2048)
+            .addDeveloperMessage(devPrompt)
+            .addUserMessage(userPrompt)
+            .build()
+    }
 
 }
