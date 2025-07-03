@@ -8,7 +8,6 @@ private val log = KotlinLogging.logger {}
 
 /**
  * Reading Context Service Logic
- *
  * @since 3rd July 2025
  */
 @Service

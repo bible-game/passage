@@ -13,15 +13,20 @@ import game.bible.passage.Passage
 import game.bible.passage.context.PostContext
 import game.bible.passage.context.PreContext
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.ai.openai.OpenAiAudioSpeechModel
+import org.springframework.ai.openai.OpenAiAudioSpeechOptions
+import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3
+import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.Voice.ALLOY
+import org.springframework.ai.openai.audio.speech.SpeechPrompt
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import java.util.Date
+
 
 private val log = KotlinLogging.logger {}
 
 /**
  * Passage Generation Service Logic
- *
  * @since 13th January 2025
  */
 @Service
@@ -31,7 +36,8 @@ class GenerationService(
     private val chat: ChatGptConfig,
     private val client: OpenAIClient,
     private val mapper: ObjectMapper,
-    private val restClient: RestClient
+    private val restClient: RestClient,
+    private val speech: OpenAiAudioSpeechModel
 ) {
 
     /** Generates a random bible passage */
@@ -79,6 +85,20 @@ class GenerationService(
             .forEach { x: String? -> context += x }
 
         return PostContext(passageKey, context)
+    }
+
+    /** Generates audio for a given passage */
+    fun audio(passageKey: String): ByteArray {
+        val text = fetchText(passageKey)
+
+        log.info { "Asking OpenAI TTS for audio [$passageKey]" }
+        val speechOptions = OpenAiAudioSpeechOptions.builder().model("tts-1")
+            .voice(ALLOY).responseFormat(MP3).speed(1.0f).build()
+
+        val prompt = SpeechPrompt(text, speechOptions)
+        val response = speech.call(prompt)
+
+        return response.result.output;
     }
 
     private fun fetchText(passageId: String): String {
