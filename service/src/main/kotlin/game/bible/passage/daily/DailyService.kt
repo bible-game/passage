@@ -14,7 +14,6 @@ private val log = KotlinLogging.logger {}
 /**
  * Daily Passage Service Logic
  *
- * @author J. R. Smith
  * @since 7th December 2024
  */
 @Service
