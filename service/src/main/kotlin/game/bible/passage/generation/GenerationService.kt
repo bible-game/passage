@@ -10,6 +10,7 @@ import game.bible.config.model.domain.BibleConfig
 import game.bible.config.model.integration.BibleApiConfig
 import game.bible.config.model.integration.ChatGptConfig
 import game.bible.passage.Passage
+import game.bible.passage.context.PostContext
 import game.bible.passage.context.PreContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -54,8 +55,8 @@ class GenerationService(
     fun preContext(passageKey: String): PreContext {
         log.info { "Asking ChatGPT for pre-context [$passageKey]" }
 
-        val devPrompt: String = chat.getContext()!!.getPromptDeveloper()!!
-        val userPrompt: String = chat.getContext()!!.getPromptUser()!! + passageKey
+        val devPrompt: String = chat.getPreContext()!!.getPromptDeveloper()!!
+        val userPrompt: String = chat.getPreContext()!!.getPromptUser()!! + passageKey
 
         var context = ""
         client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
@@ -63,6 +64,21 @@ class GenerationService(
             .forEach { x: String? -> context += x }
 
         return PreContext(passageKey, context)
+    }
+
+    /** Generates the context after a given passage */
+    fun postContext(passageKey: String): PostContext {
+        log.info { "Asking ChatGPT for post-context [$passageKey]" }
+
+        val devPrompt: String = chat.getPostContext()!!.getPromptDeveloper()!!
+        val userPrompt: String = chat.getPostContext()!!.getPromptUser()!! + passageKey
+
+        var context = ""
+        client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
+            .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
+            .forEach { x: String? -> context += x }
+
+        return PostContext(passageKey, context)
     }
 
     private fun fetchText(passageId: String): String {

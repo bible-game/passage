@@ -25,7 +25,22 @@ class ContextController(private val service: ContextService) {
             log.info { "Pre-context request received for $passageKey" }
 
             val response = service.retrievePreContext(passageKey)
-            ResponseEntity.ok(response.text)
+            ResponseEntity.ok(response)
+
+        } catch (e: Exception) {
+            log.error { e.message } // TODO :: implement proper err handle
+            ResponseEntity.ok("Some error!")
+        }
+    }
+
+    /** Returns the context after a given passage */
+    @GetMapping("/after/{passageKey}")
+    fun getPostContext(@PathVariable passageKey: String): ResponseEntity<Any> { // TODO :: implement custom response object
+        return try {
+            log.info { "Post-context request received for $passageKey" }
+
+            val response = service.retrievePostContext(passageKey)
+            ResponseEntity.ok(response)
 
         } catch (e: Exception) {
             log.error { e.message } // TODO :: implement proper err handle

@@ -6,13 +6,13 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Table
 
 /**
- * Pre-Context Model
+ * Post-Context Model
  *
  * @since 3rd July 2025
  */
 @Entity
-@Table(name = "pre_context")
-data class PreContext(
+@Table(name = "post_context")
+data class PostContext(
     val passageKey: String = "",
 
     @Column(columnDefinition="TEXT")
