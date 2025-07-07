@@ -11,7 +11,6 @@ private val log = KotlinLogging.logger {}
 
 /**
  * Exposes Reading Context-related Actions
- *
  * @since 3rd July 2025
  */
 @RestController

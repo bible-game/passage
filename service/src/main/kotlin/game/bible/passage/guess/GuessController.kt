@@ -34,7 +34,7 @@ class GuessController(private val service: GuessService) {
 
         } catch (e: Exception) {
 //            log.error("Some error!") // TODO :: proper err handle
-            log.error(e.message)
+            log.error { e.message }
             ResponseEntity.ok("Some error!")
         }
     }

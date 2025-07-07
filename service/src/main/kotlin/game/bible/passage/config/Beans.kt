@@ -6,6 +6,8 @@ import game.bible.config.ReloadableConfig
 import game.bible.config.model.integration.BibleApiConfig
 import game.bible.config.model.integration.ChatGptConfig
 import game.bible.config.model.service.PassageConfig
+import org.springframework.ai.openai.OpenAiAudioSpeechModel
+import org.springframework.ai.openai.api.OpenAiAudioApi
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -34,6 +36,11 @@ class Beans {
         return OpenAIOkHttpClient.builder()
             .apiKey(chat.getApiKey()!!)
             .build()
+    }
+
+    @Bean fun openAiAudioSpeechModel(chat: ChatGptConfig): OpenAiAudioSpeechModel {
+        val audioApi = OpenAiAudioApi.builder().apiKey(chat.getApiKey()!!).build()
+        return OpenAiAudioSpeechModel(audioApi)
     }
 
 }
