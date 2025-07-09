@@ -23,7 +23,7 @@ class ReadController(
 
     // todo :: add AOP rate limiting and retries on 429 to Next.js
 
-    private var cache: Pair<String, String>? = null // todo :: update cache key to be today's value
+    private var cache: Pair<String, String>? = null // todo :: update cache key to be today's value if exists or gen1
     private var default: String? = null
 
     @GetMapping("/{key}")
