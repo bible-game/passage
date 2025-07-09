@@ -18,17 +18,20 @@ private val log = KotlinLogging.logger {}
 class AudioController(private val service: AudioService) {
 
     /** Returns the audio for a given passage */
+    // TODO :: add webflux dependency and try running again!
+    // Question :: some sort of async / thread to save after the stream...
+        // Note :: how about passing the complete bytes back to AudioController when complete stream... it can choose to save...
     @GetMapping("/{passageKey}")
-    fun getAudio(@PathVariable passageKey: String): Any { // TODO :: implement custom response object
+    fun getAudio(@PathVariable passageKey: String): ResponseEntity<ByteArray> {
         return try {
             log.info { "Audio request received for $passageKey" }
             val response: ByteArray = service.retrieveAudio(passageKey)
 
-            return ResponseEntity.ok(response)
+            ResponseEntity.ok(response)
 
         } catch (e: Exception) {
             log.error { e.message } // TODO :: implement proper err handle
-            ResponseEntity.ok("Some error!")
+            ResponseEntity.notFound().build()
         }
     }
 

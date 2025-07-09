@@ -17,11 +17,11 @@ import org.springframework.ai.openai.OpenAiAudioSpeechModel
 import org.springframework.ai.openai.OpenAiAudioSpeechOptions
 import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3
 import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.Voice.ALLOY
+import org.springframework.ai.openai.api.OpenAiAudioApi.TtsModel.TTS_1_HD
 import org.springframework.ai.openai.audio.speech.SpeechPrompt
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import java.util.Date
-
 
 private val log = KotlinLogging.logger {}
 
@@ -92,13 +92,17 @@ class GenerationService(
         val text = fetchText(passageKey)
 
         log.info { "Asking OpenAI TTS for audio [$passageKey]" }
-        val speechOptions = OpenAiAudioSpeechOptions.builder().model("tts-1")
-            .voice(ALLOY).responseFormat(MP3).speed(1.0f).build()
+        val speechOptions = OpenAiAudioSpeechOptions.builder()
+            .model(TTS_1_HD.value)
+            .voice(ALLOY)
+            .responseFormat(MP3)
+            .speed(1.0f)
+            .build()
 
         val prompt = SpeechPrompt(text, speechOptions)
         val response = speech.call(prompt)
 
-        return response.result.output;
+        return response.result.output
     }
 
     private fun fetchText(passageId: String): String {
