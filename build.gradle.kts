@@ -49,6 +49,7 @@ subprojects {
         implementation(rootProject.libs.bundles.kotlin)
         implementation(rootProject.libs.bundles.spring)
         implementation(rootProject.libs.bundles.test)
+        implementation(rootProject.libs.bundles.web)
     }
 }
 

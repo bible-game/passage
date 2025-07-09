@@ -15,7 +15,6 @@ private val log = KotlinLogging.logger {}
 /**
  * Exposes Daily Passage-related Actions
  *
- * @author J. R. Smith
  * @since 7th December 2024
  */
 @RestController

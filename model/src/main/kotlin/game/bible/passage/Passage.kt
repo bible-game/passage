@@ -9,7 +9,6 @@ import java.util.Date
 /**
  * Passage Model
  *
- * @author J. R. Smith
  * @since 7th December 2024
  */
 @Entity
