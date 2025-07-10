@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 private val log = KotlinLogging.logger {}
 
 /**
- * Exposes Passage Audio Actions
+ * Exposes Audio-related Actions
  * @since 3rd July 2025
  */
 @RestController
@@ -18,9 +18,6 @@ private val log = KotlinLogging.logger {}
 class AudioController(private val service: AudioService) {
 
     /** Returns the audio for a given passage */
-    // TODO :: add webflux dependency and try running again!
-    // Question :: some sort of async / thread to save after the stream...
-        // Note :: how about passing the complete bytes back to AudioController when complete stream... it can choose to save...
     @GetMapping("/{passageKey}")
     fun getAudio(@PathVariable passageKey: String): ResponseEntity<ByteArray> {
         return try {
