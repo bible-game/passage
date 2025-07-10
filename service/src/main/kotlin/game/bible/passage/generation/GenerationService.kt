@@ -131,7 +131,7 @@ class GenerationService(
 
     private fun fetchText(passageId: String): String {
         log.info { "Attempting to fetch text for $passageId" }
-        val url = "${api.getBaseUrl()}/$passageId"
+        val url = "${api.getBaseUrl()}/$passageId?single_chapter_book_matching=indifferent"
 
         val response = restClient.get()
                         .uri(url).retrieve()

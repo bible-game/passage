@@ -28,7 +28,7 @@ class ReadController(
 
     @GetMapping("/{key}")
     fun getReading(@PathVariable key: String): ResponseEntity<Any> {
-        val url = "${api.getBaseUrl()}/$key"
+        val url = "${api.getBaseUrl()}/$key?single_chapter_book_matching=indifferent"
 
         if (key == "genesis1") {
             if (default.isNullOrEmpty()) {
