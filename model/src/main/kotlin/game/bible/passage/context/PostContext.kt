@@ -7,7 +7,6 @@ import jakarta.persistence.Table
 
 /**
  * Post-Context Model
- *
  * @since 3rd July 2025
  */
 @Entity

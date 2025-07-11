@@ -7,7 +7,6 @@ import java.util.Optional
 
 /**
  * Passage Data Access
- *
  * @since 9th December 2024
  */
 @Repository

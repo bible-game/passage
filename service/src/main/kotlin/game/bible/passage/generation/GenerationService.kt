@@ -12,6 +12,8 @@ import game.bible.config.model.integration.ChatGptConfig
 import game.bible.passage.Passage
 import game.bible.passage.context.PostContext
 import game.bible.passage.context.PreContext
+import game.bible.passage.study.Question
+import game.bible.passage.study.Study
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.ai.openai.OpenAiAudioSpeechModel
 import org.springframework.ai.openai.OpenAiAudioSpeechOptions
@@ -26,7 +28,7 @@ import java.util.Date
 private val log = KotlinLogging.logger {}
 
 /**
- * Passage Generation Service Logic
+ * Generation Service Logic
  * @since 13th January 2025
  */
 @Service
@@ -87,6 +89,28 @@ class GenerationService(
         return PostContext(passageKey, context)
     }
 
+    /** Generates a study for a given passage */
+    fun study(passageKey: String): Study {
+        log.info { "Asking ChatGPT for study [$passageKey]" }
+
+        val devPrompt: String = chat.getStudy()!!.getPromptDeveloper()!!
+        val userPrompt: String = chat.getStudy()!!.getPromptUser()!! + passageKey
+
+        var response = ""
+        client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
+            .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
+            .forEach { x: String? -> response += x }
+
+        val study = Study(passageKey)
+        val questions: List<Question> = mapper.readValue(
+            response, mapper.typeFactory.constructCollectionType(List::class.java, Question::class.java))
+
+        questions.forEach { it.study = study }
+        study.questions = questions
+
+        return study
+    }
+
     /** Generates audio for a given passage */
     fun audio(passageKey: String): ByteArray {
         val text = fetchText(passageKey)
@@ -107,7 +131,7 @@ class GenerationService(
 
     private fun fetchText(passageId: String): String {
         log.info { "Attempting to fetch text for $passageId" }
-        val url = "${api.getBaseUrl()}/$passageId"
+        val url = "${api.getBaseUrl()}/$passageId?single_chapter_book_matching=indifferent"
 
         val response = restClient.get()
                         .uri(url).retrieve()

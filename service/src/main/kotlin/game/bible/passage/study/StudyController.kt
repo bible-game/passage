@@ -1,4 +1,4 @@
-package game.bible.passage.audio
+package game.bible.passage.study
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.ResponseEntity
@@ -10,25 +10,25 @@ import org.springframework.web.bind.annotation.RestController
 private val log = KotlinLogging.logger {}
 
 /**
- * Exposes Audio-related Actions
+ * Exposes Study-related Actions
  * @since 3rd July 2025
  */
 @RestController
-@RequestMapping("/audio")
-class AudioController(private val service: AudioService) {
+@RequestMapping("/study")
+class StudyController(private val service: StudyService) {
 
-    /** Returns the audio for a given passage */
+    /** Returns the study for a given passage */
     @GetMapping("/{passageKey}")
-    fun getAudio(@PathVariable passageKey: String): ResponseEntity<ByteArray> {
+    fun getStudy(@PathVariable passageKey: String): ResponseEntity<Any> {
         return try {
-            log.info { "Audio request received for $passageKey" }
-            val response: ByteArray = service.retrieveAudio(passageKey)
+            log.info { "Study request received for $passageKey" }
+            val response: Study = service.retrieveStudy(passageKey)
 
             ResponseEntity.ok(response)
 
         } catch (e: Exception) {
             log.error { e.message } // TODO :: implement proper err handle
-            ResponseEntity.notFound().build()
+            ResponseEntity.ok("Some error!")
         }
     }
 
