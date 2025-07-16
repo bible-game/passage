@@ -8,7 +8,12 @@ import game.bible.config.model.integration.AwsConfig
 import game.bible.config.model.integration.BibleApiConfig
 import game.bible.config.model.integration.ChatGptConfig
 import game.bible.config.model.service.PassageConfig
+import org.springframework.ai.document.MetadataMode
+import org.springframework.ai.document.MetadataMode.EMBED
 import org.springframework.ai.openai.OpenAiAudioSpeechModel
+import org.springframework.ai.openai.OpenAiEmbeddingModel
+import org.springframework.ai.openai.OpenAiEmbeddingOptions
+import org.springframework.ai.openai.api.OpenAiApi
 import org.springframework.ai.openai.api.OpenAiAudioApi
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -48,6 +53,15 @@ class Beans {
     @Bean fun openAiAudioSpeechModel(chat: ChatGptConfig): OpenAiAudioSpeechModel {
         val audioApi = OpenAiAudioApi.builder().apiKey(chat.getApiKey()!!).build()
         return OpenAiAudioSpeechModel(audioApi)
+    }
+
+    @Bean fun openAiEmbeddingModel(chat: ChatGptConfig): OpenAiEmbeddingModel {
+        val audioApi = OpenAiApi.builder().apiKey(chat.getApiKey()!!).build()
+        return OpenAiEmbeddingModel(
+            audioApi, EMBED, OpenAiEmbeddingOptions.builder()
+                .model("text-embedding-3-large")
+                .build()
+        )
     }
 
     @Bean fun s3Client(aws: AwsConfig): S3Client {
