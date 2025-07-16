@@ -49,7 +49,7 @@ class StudyService(
 
         // STEP 4: Identify underrepresented ideas (threshold now stricter)
         val missingChunks = goldenChunks.zip(similarities)
-            .filter { (_, sim) -> sim < 0.8 }
+            .filter { (_, sim) -> sim < 0.75 }
             .map { (chunk, _) -> chunk }
 
         // STEP 5: Simplify missing feedback (first clause)
