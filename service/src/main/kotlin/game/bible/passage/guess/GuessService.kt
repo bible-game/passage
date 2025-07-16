@@ -64,8 +64,10 @@ class GuessService(
             verseDistance += verseMap[chapter]!!
         }
 
+        val sign  = if (guessIndex < answerIndex) -1 else 1
+
         val percentage = 100.0 * (totalVerses - verseDistance) / totalVerses
-        return Closeness(verseDistance, floor(percentage).toInt())
+        return Closeness(sign * verseDistance, floor(percentage).toInt())
     }
 
 }
