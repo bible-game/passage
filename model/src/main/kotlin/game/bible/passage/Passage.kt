@@ -8,7 +8,6 @@ import java.util.Date
 
 /**
  * Passage Model
- *
  * @since 7th December 2024
  */
 @Entity
