@@ -14,4 +14,4 @@ spring:
 
 application:
   config:
-    dir: ${BLE_CONFIG:/etc/secrets}
+    dir: ${BLE_CONFIG}

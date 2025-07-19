@@ -51,6 +51,11 @@ subprojects {
         implementation(rootProject.libs.bundles.test)
         implementation(rootProject.libs.bundles.web)
     }
+
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
 }
 
 tasks.register("printTagVersion") {

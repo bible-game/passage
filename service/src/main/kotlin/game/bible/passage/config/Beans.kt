@@ -8,7 +8,6 @@ import game.bible.config.model.integration.AwsConfig
 import game.bible.config.model.integration.BibleApiConfig
 import game.bible.config.model.integration.ChatGptConfig
 import game.bible.config.model.service.PassageConfig
-import org.springframework.ai.document.MetadataMode
 import org.springframework.ai.document.MetadataMode.EMBED
 import org.springframework.ai.openai.OpenAiAudioSpeechModel
 import org.springframework.ai.openai.OpenAiEmbeddingModel
