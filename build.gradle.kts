@@ -63,3 +63,7 @@ tasks.register("printTagVersion") {
         println(project.version.toString().split("-")[0])
     }
 }
+
+test {
+    failOnNoDiscoveredTests = false
+}
