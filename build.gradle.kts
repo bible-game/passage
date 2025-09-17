@@ -53,9 +53,12 @@ subprojects {
     }
 
 
-    tasks.withType<Test> {
+    tasks.withType<Test>().configureEach {
         useJUnitPlatform()
-        failOnNoDiscoveredTests = false
+
+        filter {
+            isFailOnNoMatchingTests = false
+        }
     }
 }
 
@@ -63,8 +66,4 @@ tasks.register("printTagVersion") {
     doLast {
         println(project.version.toString().split("-")[0])
     }
-}
-
-test {
-    failOnNoDiscoveredTests = false
 }
