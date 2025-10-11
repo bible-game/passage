@@ -19,12 +19,11 @@ private val log = KotlinLogging.logger {}
 @RequestMapping("/config")
 class ConfigController(private val bible: BibleConfig) {
 
-    /** Returns configured bible information */
-    @GetMapping("/bible")
-    fun getBibleConfig(): ResponseEntity<BibleConfigResponse> {
-        log.info { "Bible config request received" }
-        val response = BibleConfigResponse(config = bible)
-        return ResponseEntity.ok(response)
-    }
+  /** Returns configured bible information */
+  @GetMapping("/bible")
+  fun getBibleConfig(): ResponseEntity<BibleConfig> {
+    log.info { "Bible config request received" }
+    return ResponseEntity.ok(bible)
+  }
 
 }

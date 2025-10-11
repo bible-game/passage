@@ -6,6 +6,7 @@ import game.bible.common.util.resource.S3BucketService
 import game.bible.config.ReloadableConfig
 import game.bible.config.model.integration.AwsConfig
 import game.bible.config.model.integration.BibleApiConfig
+import game.bible.config.model.integration.BollsLifeApiConfig
 import game.bible.config.model.integration.ChatGptConfig
 import game.bible.config.model.service.PassageConfig
 import org.springframework.ai.document.MetadataMode.EMBED
@@ -35,6 +36,7 @@ import software.amazon.awssdk.services.s3.S3Client
     ReloadableConfig::class,
     PassageConfig::class,
     BibleApiConfig::class,
+    BollsLifeApiConfig::class,
     ChatGptConfig::class)
 class Beans {
 
