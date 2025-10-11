@@ -70,6 +70,21 @@ class GenerationService(
         return Passage(date, book.getName()!!, chapter, "", summary, verses, icon, text)
     }
 
+    fun getLatestPrompt(prefix: PromptType): String? {
+        val existingKeys = findKeysWithPrefix("${prefix.toString()}:")
+
+        var cachedPrompt: String? = null
+        val latestKey = existingKeys.maxOrNull()
+
+        if (latestKey != null) {
+            cachedPrompt = redis.opsForValue().get(latestKey) as? String
+            log.info { "Found prompt in Redis cache [$latestKey]" }
+        } else {
+            log.info { "No prompt found in Redis cache with prefix [$prefix]" }
+        }
+        return cachedPrompt
+    }
+
     fun findKeysWithPrefix(prefix: String, count: Long = 100): Set<String> {
         val keys = mutableSetOf<String>()
         log.info { "Searching Redis for keys with prefix [$prefix]" }
@@ -85,19 +100,7 @@ class GenerationService(
 
     /** Generates the context leading up to a given passage */
     fun preContext(passageKey: String): PreContext {
-        val cacheKey = "precontext:"
-
-        val existingKeys = findKeysWithPrefix(cacheKey)
-
-        var cachedPrompt: String? = null
-        val latestKey = existingKeys.maxOrNull()
-
-        if (latestKey != null) {
-            cachedPrompt = redis.opsForValue().get(latestKey) as? String
-            log.info { "Found pre-context prompt in Redis cache [$latestKey]" }
-        } else {
-            log.info { "No pre-context prompt found in Redis cache" }
-        }
+        val cachedPrompt = getLatestPrompt(PromptType.PRE_CONTEXT)
 
         log.info { "Asking ChatGPT for pre-context [$passageKey]" }
 
@@ -180,13 +183,17 @@ class GenerationService(
     fun feedbackPrompt(feedback: String, promptType: PromptType): String {
         log.info { "Asking ChatGPT for new prompt based on feedback summary [$promptType]" }
 
-        val existingPrompt = when (promptType) {
-            PromptType.PRE_CONTEXT -> chat.getPreContext()!!.getPromptUser()!!
-            PromptType.POST_CONTEXT -> chat.getPostContext()!!.getPromptUser()!!
-            PromptType.DAILY -> chat.getDaily()!!.getPromptUser()!!
-            PromptType.STUDY -> chat.getStudy()!!.getPromptUser()!!
-            PromptType.GOLDEN -> chat.getGolden()!!.getPromptUser()!!
-            PromptType.FEEDBACK -> chat.getFeedback()!!.getPromptUser()!!
+        var existingPrompt = getLatestPrompt(promptType)
+
+        if (existingPrompt == null) {
+            existingPrompt = when (promptType) {
+                PromptType.PRE_CONTEXT -> chat.getPreContext()!!.getPromptUser()!!
+                PromptType.POST_CONTEXT -> chat.getPostContext()!!.getPromptUser()!!
+                PromptType.DAILY -> chat.getDaily()!!.getPromptUser()!!
+                PromptType.STUDY -> chat.getStudy()!!.getPromptUser()!!
+                PromptType.GOLDEN -> chat.getGolden()!!.getPromptUser()!!
+                PromptType.FEEDBACK -> chat.getFeedback()!!.getPromptUser()!!
+            }
         }
 
         val devPrompt: String = chat.getFeedback()!!.getPromptDeveloper()!! + feedback
