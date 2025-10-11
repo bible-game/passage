@@ -28,37 +28,3 @@ class FeedbackService {
         )
     }
 }
-
-/**
- * Feedback request data
- */
-data class FeedbackRequest(
-    val passageKey: String,
-    val feedback: FeedbackSentiment,
-    val context: ContextType,
-    val comment: String? = null
-)
-
-/**
- * Feedback sentiment enum
- */
-enum class FeedbackSentiment {
-    POSITIVE,
-    NEGATIVE
-}
-
-/**
- * Context type enum
- */
-enum class ContextType {
-    BEFORE,
-    AFTER
-}
-
-/**
- * Feedback response data
- */
-data class FeedbackResponse(
-    val success: Boolean,
-    val message: String
-)
