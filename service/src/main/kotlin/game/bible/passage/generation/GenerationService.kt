@@ -190,7 +190,7 @@ class GenerationService(
         }
 
         val devPrompt: String = chat.getFeedback()!!.getPromptDeveloper()!! + feedback
-        val userPrompt: String = chat.getGolden()!!.getPromptUser()!! + existingPrompt
+        val userPrompt: String = chat.getFeedback()!!.getPromptUser()!! + existingPrompt
 
         var prompt = ""
         message(devPrompt, userPrompt).forEach { x: String? -> prompt += x }
