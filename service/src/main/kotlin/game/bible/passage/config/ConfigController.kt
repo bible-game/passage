@@ -21,10 +21,9 @@ class ConfigController(private val bible: BibleConfig) {
 
     /** Returns configured bible information */
     @GetMapping("/bible")
-    fun getBibleConfig(): ResponseEntity<BibleConfigResponse> {
+    fun getBibleConfig(): ResponseEntity<BibleConfig> {
         log.info { "Bible config request received" }
-        val response = BibleConfigResponse(config = bible)
-        return ResponseEntity.ok(response)
+        return ResponseEntity.ok(bible)
     }
 
 }
