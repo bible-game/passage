@@ -12,6 +12,7 @@ import game.bible.config.model.integration.ChatGptConfig
 import game.bible.passage.Passage
 import game.bible.passage.context.PostContext
 import game.bible.passage.context.PreContext
+import game.bible.passage.feedback.PromptType
 import game.bible.passage.study.Question
 import game.bible.passage.study.Study
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -147,6 +148,31 @@ class GenerationService(
 
         return response.result.output
     }
+
+
+    /** Generates a new prompt based on user feedback */
+    fun feedbackPrompt(feedback: String, promptType: PromptType): String {
+        log.info { "Asking ChatGPT for new prompt based on feedback summary [$promptType]" }
+
+        val existingPrompt = when (promptType) {
+            PromptType.PRE_CONTEXT -> chat.getPreContext()!!.getPromptUser()!!
+            PromptType.POST_CONTEXT -> chat.getPostContext()!!.getPromptUser()!!
+            PromptType.DAILY -> chat.getDaily()!!.getPromptUser()!!
+            PromptType.STUDY -> chat.getStudy()!!.getPromptUser()!!
+            PromptType.GOLDEN -> chat.getGolden()!!.getPromptUser()!!
+            PromptType.FEEDBACK -> chat.getFeedback()!!.getPromptUser()!!
+        }
+
+        val devPrompt: String = chat.getFeedback()!!.getPromptDeveloper()!! + feedback
+        val userPrompt: String = chat.getGolden()!!.getPromptUser()!! + existingPrompt
+
+        var prompt = ""
+        message(devPrompt, userPrompt).forEach { x: String? -> prompt += x }
+
+        return prompt
+    }
+
+
 
     private fun fetchText(passageId: String): String {
         log.info { "Attempting to fetch text for $passageId" }
