@@ -22,18 +22,9 @@ class FeedbackController(private val service: FeedbackService) {
      */
     @PostMapping
     fun postFeedback(@RequestBody request: FeedbackRequest): ResponseEntity<FeedbackResponse> {
-        return try {
-            log.info { "Feedback request received for passage: ${request.passageKey}" }
-            val response = service.getFeedback(request)
+        log.info { "Feedback request received for passage: ${request.passageKey}" }
+        val response = service.getFeedback(request)
 
-            ResponseEntity.ok(response)
-
-        } catch (e: Exception) {
-            log.error { "Error processing feedback: ${e.message}" }
-            ResponseEntity.ok(FeedbackResponse(
-                success = false,
-                message = "Failed to process feedback. Please try again."
-            ))
-        }
+        return ResponseEntity.ok(response)
     }
 }

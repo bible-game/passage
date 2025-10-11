@@ -18,9 +18,9 @@ class FeedbackService {
     fun getFeedback(request: FeedbackRequest): FeedbackResponse {
         log.info { "Received feedback for passage: ${request.passageKey}, sentiment: ${request.feedback}, context: ${request.context}" }
 
-        // TODO: Store feedback in database
-        // TODO: If negative feedback accumulates, trigger prompt optimization
-        // TODO: Track feedback metrics for analytics
+        //TODO: Using the feedback data, we ask for an update prompt to be generated
+      // TODO: We will do this every time for now and later we will aggregate feedback and do it once in a while
+        //TODO: Store the new prompt in redis for future use for now
 
         return FeedbackResponse(
             success = true,
