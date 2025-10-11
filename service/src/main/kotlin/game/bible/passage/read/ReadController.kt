@@ -40,13 +40,13 @@ class ReadController(
             return ResponseEntity.ok(default)
         }
 
-        if (cache != null && cache!!.first == key) {
+        if (cache != null && cache!!.first == "$key-$translation") {
             log.info { "Using cache!" }
             return ResponseEntity.ok(cache?.second)
         }
 
         return try {
-            cache = Pair(key, restClient.get().uri(url).retrieve().body(String::class.java)!!)
+            cache = Pair("$key-$translation", restClient.get().uri(url).retrieve().body(String::class.java)!!)
             ResponseEntity.ok((cache?.second))
 
         } catch (e: Exception) {
