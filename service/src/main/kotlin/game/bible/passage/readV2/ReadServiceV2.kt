@@ -45,6 +45,8 @@ class ReadServiceV2(
             throw ValidationException("Version cannot be blank")
         }
 
+        log.info { "getBooksForVersion called for version: $version" }
+
         // Check cache first
         booksCache[version]?.let {
             log.info { "Using cached books for version: $version" }
@@ -52,11 +54,15 @@ class ReadServiceV2(
         }
 
         // Fetch from API
+        log.info { "Cache miss, fetching books from API for version: $version" }
         val url = api.getBooksUrl(version)
         val books = fetchBooksFromApi(url, version)
 
-        // Cache the result
-        booksCache[version] = books
+        // Only cache if we got a valid response
+        if (books.isNotEmpty()) {
+            booksCache[version] = books
+            log.info { "Cached ${books.size} books for version: $version" }
+        }
 
         return books
     }
@@ -185,19 +191,23 @@ class ReadServiceV2(
     }
 
     private fun fetchBooksFromApi(url: String, version: String): List<BookResponse> {
-        return try {
-            log.info { "Fetching books from API: $url" }
-            val response = restClient.get()
-                .uri(url)
-                .retrieve()
-                .body(String::class.java)
-                ?: throw ExternalServiceException("Bolls.Life API", "Empty response received")
+        log.info { "Fetching books from API for version $version" }
+        log.info { "API URL: $url" }
 
-            objectMapper.readValue(response, object : TypeReference<List<BookResponse>>() {})
-        } catch (e: Exception) {
-            log.error(e) { "Failed to fetch books from Bolls.Life API for version $version: $url" }
-            throw ExternalServiceException("Bolls.Life API", "Failed to fetch books for version $version", e)
-        }
+        val response = restClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .scheme("https")
+                    .host("bolls.life")
+                    .path("/get-books/$version/")
+                    .build()
+            }
+            .retrieve()
+            .body(String::class.java)
+            ?: throw ExternalServiceException("Bolls.Life API", "Empty response received")
+
+        log.info { "Response received, length: ${response.length}" }
+        return objectMapper.readValue(response, object : TypeReference<List<BookResponse>>() {})
     }
 
     private fun fetchVersesFromApi(
@@ -206,22 +216,22 @@ class ReadServiceV2(
         bookId: String,
         chapter: Int
     ): List<VerseResponse> {
-        return try {
-            log.info { "Fetching verses from API: $url" }
-            val response = restClient.get()
-                .uri(url)
-                .retrieve()
-                .body(String::class.java)
-                ?: throw ExternalServiceException("Bolls.Life API", "Empty response received")
+        log.info { "Fetching verses from API for $version/$bookId/$chapter" }
+        log.info { "API URL: $url" }
 
-            objectMapper.readValue(response, object : TypeReference<List<VerseResponse>>() {})
-        } catch (e: Exception) {
-            log.error(e) { "Failed to fetch verses from Bolls.Life API: $url" }
-            throw ExternalServiceException(
-                "Bolls.Life API",
-                "Failed to fetch chapter text for $version/$bookId/$chapter",
-                e
-            )
-        }
+        val response = restClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .scheme("https")
+                    .host("bolls.life")
+                    .path("/get-text/$version/$bookId/$chapter/")
+                    .build()
+            }
+            .retrieve()
+            .body(String::class.java)
+            ?: throw ExternalServiceException("Bolls.Life API", "Empty response received")
+
+        log.info { "Response received, length: ${response.length}" }
+        return objectMapper.readValue(response, object : TypeReference<List<VerseResponse>>() {})
     }
 }
