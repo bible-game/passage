@@ -93,7 +93,7 @@ class GenerationService(
         val latestKey = existingKeys.maxOrNull()
 
         if (latestKey != null) {
-            cachedPrompt = redis.opsForValue().get(latestKey) as String
+            cachedPrompt = redis.opsForValue().get(latestKey) as? String
             log.info { "Found pre-context prompt in Redis cache [$latestKey]" }
         } else {
             log.info { "No pre-context prompt found in Redis cache" }
