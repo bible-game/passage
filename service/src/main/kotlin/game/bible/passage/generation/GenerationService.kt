@@ -71,7 +71,8 @@ class GenerationService(
     }
 
     fun getLatestPrompt(prefix: PromptType): String? {
-        val existingKeys = findKeysWithPrefix("${prefix.toString()}:")
+        val fullPrefix = "${prefix.toString()}:"
+        val existingKeys = findKeysWithPrefix(fullPrefix)
 
         var cachedPrompt: String? = null
         val latestKey = existingKeys.maxOrNull()
@@ -80,7 +81,7 @@ class GenerationService(
             cachedPrompt = redis.opsForValue().get(latestKey) as? String
             log.info { "Found prompt in Redis cache [$latestKey]" }
         } else {
-            log.info { "No prompt found in Redis cache with prefix [$prefix]" }
+            log.info { "No prompt found in Redis cache with prefix [$fullPrefix]" }
         }
         return cachedPrompt
     }

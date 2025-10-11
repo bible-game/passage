@@ -2,6 +2,7 @@ package game.bible.passage.feedback
 
 import game.bible.passage.generation.GenerationService
 import game.bible.passage.context.PreContextRepository
+import game.bible.passage.feedback.PromptType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
@@ -28,7 +29,7 @@ class FeedbackService(
 
         if (request.feedback == FeedbackSentiment.NEGATIVE) {
             val newPrompt = generationService.feedbackPrompt(request.comment ?: "I don't like it", request.promptType)
-            redis.opsForValue().set("precontext:${System.currentTimeMillis()}", newPrompt)
+            redis.opsForValue().set("${request.promptType}:${System.currentTimeMillis()}", newPrompt)
 
             // TODO: Implement for other prompt types
             if (request.promptType == PromptType.PRE_CONTEXT) {
