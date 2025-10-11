@@ -105,9 +105,7 @@ class GenerationService(
         val userPrompt: String = cachedPrompt ?: (chat.getPreContext()!!.getPromptUser()!! + passageKey)
 
         var context = ""
-        client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
-            .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
-            .forEach { x: String? -> context += x }
+        message(devPrompt, userPrompt).forEach { x: String? -> context += x }
 
         return PreContext(passageKey, context)
     }
@@ -120,9 +118,7 @@ class GenerationService(
         val userPrompt: String = chat.getPostContext()!!.getPromptUser()!! + passageKey
 
         var context = ""
-        client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
-            .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
-            .forEach { x: String? -> context += x }
+        message(devPrompt, userPrompt).forEach { x: String? -> context += x }
 
         return PostContext(passageKey, context)
     }
