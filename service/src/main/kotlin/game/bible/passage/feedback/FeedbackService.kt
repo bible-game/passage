@@ -16,7 +16,10 @@ class FeedbackService {
      * Processes user feedback on passage context
      */
     fun getFeedback(request: FeedbackRequest): FeedbackResponse {
-        log.info { "Received feedback for passage: ${request.passageKey}, sentiment: ${request.feedback}, context: ${request.context}" }
+        log.info { "Received feedback for passage: ${request.passageKey}, sentiment: ${request.feedback}, context: ${request.promptType}" }
+
+      // feedback data + prompt
+
 
         //TODO: Using the feedback data, we ask for an update prompt to be generated
       // TODO: We will do this every time for now and later we will aggregate feedback and do it once in a while

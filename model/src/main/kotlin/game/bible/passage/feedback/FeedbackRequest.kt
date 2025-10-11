@@ -7,7 +7,7 @@ package game.bible.passage.feedback
 data class FeedbackRequest(
     val passageKey: String,
     val feedback: FeedbackSentiment,
-    val context: ContextType,
+    val promptType: PromptType,
     val comment: String? = null
 )
 
@@ -22,7 +22,12 @@ enum class FeedbackSentiment {
 /**
  * Context type enum
  */
-enum class ContextType {
-    BEFORE,
-    AFTER
+enum class PromptType {
+    PRE_CONTEXT,
+    POST_CONTEXT,
+    DAILY,
+    STUDY,
+    GOLDEN,
+    FEEDBACK
+
 }
