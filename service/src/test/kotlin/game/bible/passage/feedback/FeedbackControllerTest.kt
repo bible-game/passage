@@ -36,7 +36,7 @@ class FeedbackControllerTest {
         val request = FeedbackRequest(
             passageKey = "Acts8",
             feedback = FeedbackSentiment.POSITIVE,
-            context = ContextType.BEFORE,
+            promptType = PromptType.PRE_CONTEXT,
             comment = "Great context!"
         )
 
@@ -64,7 +64,7 @@ class FeedbackControllerTest {
         val request = FeedbackRequest(
             passageKey = "Genesis1",
             feedback = FeedbackSentiment.NEGATIVE,
-            context = ContextType.AFTER,
+            promptType = PromptType.POST_CONTEXT,
             comment = "Context was too brief and didn't provide enough background"
         )
 
@@ -92,7 +92,7 @@ class FeedbackControllerTest {
         val request = FeedbackRequest(
             passageKey = "John3",
             feedback = FeedbackSentiment.POSITIVE,
-            context = ContextType.BEFORE,
+            promptType = PromptType.PRE_CONTEXT,
             comment = null
         )
 
@@ -120,7 +120,7 @@ class FeedbackControllerTest {
             {
                 "passageKey": "Acts8",
                 "feedback": "INVALID_SENTIMENT",
-                "context": "BEFORE",
+                "promptType": "PRE_CONTEXT",
                 "comment": "Test comment"
             }
         """
@@ -135,13 +135,13 @@ class FeedbackControllerTest {
     }
 
     @Test
-    fun `should return 400 for invalid context type`() {
+    fun `should return 400 for invalid prompt type`() {
         // Given
         val invalidJson = """
             {
                 "passageKey": "Acts8",
                 "feedback": "POSITIVE",
-                "context": "INVALID_CONTEXT",
+                "promptType": "INVALID_PROMPT_TYPE",
                 "comment": "Test comment"
             }
         """

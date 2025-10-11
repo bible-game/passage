@@ -26,6 +26,8 @@ import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.AudioRespo
 import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.Voice.ALLOY
 import org.springframework.ai.openai.api.OpenAiAudioApi.TtsModel.TTS_1_HD
 import org.springframework.ai.openai.audio.speech.SpeechPrompt
+import org.springframework.data.redis.core.ScanOptions
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import java.util.Date
@@ -47,7 +49,8 @@ class GenerationService(
     private val mapper: ObjectMapper,
     private val restClient: RestClient,
     private val speech: OpenAiAudioSpeechModel,
-    private val embedding: OpenAiEmbeddingModel
+    private val embedding: OpenAiEmbeddingModel,
+    private val redis: StringRedisTemplate
 ) {
 
     /** Generates a random bible passage */
@@ -67,12 +70,39 @@ class GenerationService(
         return Passage(date, book.getName()!!, chapter, "", summary, verses, icon, text)
     }
 
+    fun findKeysWithPrefix(prefix: String, count: Long = 100): Set<String> {
+        val keys = mutableSetOf<String>()
+        log.info { "Searching Redis for keys with prefix [$prefix]" }
+        val scanOptions = ScanOptions.scanOptions().match("$prefix*").count(count).build()
+
+        val cursor = redis.scan(scanOptions)
+        while (cursor.hasNext()) {
+            keys.add(cursor.next())
+        }
+        cursor.close()
+        return keys
+    }
+
     /** Generates the context leading up to a given passage */
     fun preContext(passageKey: String): PreContext {
+        val cacheKey = "precontext:"
+
+        val existingKeys = findKeysWithPrefix(cacheKey)
+
+        var cachedPrompt: String? = null
+        val latestKey = existingKeys.maxOrNull()
+
+        if (latestKey != null) {
+            cachedPrompt = redis.opsForValue().get(latestKey) as String
+            log.info { "Found pre-context prompt in Redis cache [$latestKey]" }
+        } else {
+            log.info { "No pre-context prompt found in Redis cache" }
+        }
+
         log.info { "Asking ChatGPT for pre-context [$passageKey]" }
 
         val devPrompt: String = chat.getPreContext()!!.getPromptDeveloper()!!
-        val userPrompt: String = chat.getPreContext()!!.getPromptUser()!! + passageKey
+        val userPrompt: String = cachedPrompt ?: (chat.getPreContext()!!.getPromptUser()!! + passageKey)
 
         var context = ""
         client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
