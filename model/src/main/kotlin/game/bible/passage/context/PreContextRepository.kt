@@ -14,4 +14,5 @@ interface PreContextRepository : JpaRepository<PreContext, Long> {
 
     fun findByPassageKey(key: String): Optional<PreContext>
 
+    fun deleteByPassageKey(key: String): Int
 }

@@ -12,6 +12,7 @@ import game.bible.config.model.integration.ChatGptConfig
 import game.bible.passage.Passage
 import game.bible.passage.context.PostContext
 import game.bible.passage.context.PreContext
+import game.bible.passage.feedback.PromptType
 import game.bible.passage.study.Question
 import game.bible.passage.study.Study
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -25,6 +26,8 @@ import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.AudioRespo
 import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.Voice.ALLOY
 import org.springframework.ai.openai.api.OpenAiAudioApi.TtsModel.TTS_1_HD
 import org.springframework.ai.openai.audio.speech.SpeechPrompt
+import org.springframework.data.redis.core.ScanOptions
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import java.util.Date
@@ -46,7 +49,8 @@ class GenerationService(
     private val mapper: ObjectMapper,
     private val restClient: RestClient,
     private val speech: OpenAiAudioSpeechModel,
-    private val embedding: OpenAiEmbeddingModel
+    private val embedding: OpenAiEmbeddingModel,
+    private val redis: StringRedisTemplate
 ) {
 
     /** Generates a random bible passage */
@@ -66,17 +70,46 @@ class GenerationService(
         return Passage(date, book.getName()!!, chapter, "", summary, verses, icon, text)
     }
 
+    fun getLatestPrompt(prefix: PromptType): String? {
+        val fullPrefix = "${prefix.toString()}:"
+        val existingKeys = findKeysWithPrefix(fullPrefix)
+
+        var cachedPrompt: String? = null
+        val latestKey = existingKeys.maxOrNull()
+
+        if (latestKey != null) {
+            cachedPrompt = redis.opsForValue().get(latestKey) as? String
+            log.info { "Found prompt in Redis cache [$latestKey]" }
+        } else {
+            log.info { "No prompt found in Redis cache with prefix [$fullPrefix]" }
+        }
+        return cachedPrompt
+    }
+
+    fun findKeysWithPrefix(prefix: String, count: Long = 100): Set<String> {
+        val keys = mutableSetOf<String>()
+        log.info { "Searching Redis for keys with prefix [$prefix]" }
+        val scanOptions = ScanOptions.scanOptions().match("$prefix*").count(count).build()
+
+        val cursor = redis.scan(scanOptions)
+        while (cursor.hasNext()) {
+            keys.add(cursor.next())
+        }
+        cursor.close()
+        return keys
+    }
+
     /** Generates the context leading up to a given passage */
     fun preContext(passageKey: String): PreContext {
+        val cachedPrompt = getLatestPrompt(PromptType.PRE_CONTEXT)
+
         log.info { "Asking ChatGPT for pre-context [$passageKey]" }
 
         val devPrompt: String = chat.getPreContext()!!.getPromptDeveloper()!!
-        val userPrompt: String = chat.getPreContext()!!.getPromptUser()!! + passageKey
+        val userPrompt: String = cachedPrompt ?: chat.getPreContext()!!.getPromptUser()!! + passageKey
 
         var context = ""
-        client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
-            .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
-            .forEach { x: String? -> context += x }
+        message(devPrompt, userPrompt).forEach { x: String? -> context += x }
 
         return PreContext(passageKey, context)
     }
@@ -89,9 +122,7 @@ class GenerationService(
         val userPrompt: String = chat.getPostContext()!!.getPromptUser()!! + passageKey
 
         var context = ""
-        client.chat().completions().create(createParams(devPrompt, userPrompt)).choices().stream()
-            .flatMap { choice: ChatCompletion.Choice -> choice.message().content().stream() }
-            .forEach { x: String? -> context += x }
+        message(devPrompt, userPrompt).forEach { x: String? -> context += x }
 
         return PostContext(passageKey, context)
     }
@@ -147,6 +178,35 @@ class GenerationService(
 
         return response.result.output
     }
+
+
+    /** Generates a new prompt based on user feedback */
+    fun feedbackPrompt(feedback: String, promptType: PromptType): String {
+        log.info { "Asking ChatGPT for new prompt based on feedback summary [$promptType]" }
+
+        var existingPrompt = getLatestPrompt(promptType)
+
+        if (existingPrompt == null) {
+            existingPrompt = when (promptType) {
+                PromptType.PRE_CONTEXT -> chat.getPreContext()!!.getPromptUser()!!
+                PromptType.POST_CONTEXT -> chat.getPostContext()!!.getPromptUser()!!
+                PromptType.DAILY -> chat.getDaily()!!.getPromptUser()!!
+                PromptType.STUDY -> chat.getStudy()!!.getPromptUser()!!
+                PromptType.GOLDEN -> chat.getGolden()!!.getPromptUser()!!
+                PromptType.FEEDBACK -> chat.getFeedback()!!.getPromptUser()!!
+            }
+        }
+
+        val devPrompt: String = chat.getFeedback()!!.getPromptDeveloper()!! + feedback
+        val userPrompt: String = chat.getFeedback()!!.getPromptUser()!! + existingPrompt
+
+        var prompt = ""
+        message(devPrompt, userPrompt).forEach { x: String? -> prompt += x }
+
+        return prompt
+    }
+
+
 
     private fun fetchText(passageId: String): String {
         log.info { "Attempting to fetch text for $passageId" }

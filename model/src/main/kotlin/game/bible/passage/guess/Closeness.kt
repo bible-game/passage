@@ -1,7 +1,10 @@
 package game.bible.passage.guess
 
-// Question :: kotlin best-practise?
-class Closeness (
+/**
+ * Closeness response model
+ * @since 21st January 2025
+ */
+data class Closeness(
     val distance: Int,
     val percentage: Int
 )

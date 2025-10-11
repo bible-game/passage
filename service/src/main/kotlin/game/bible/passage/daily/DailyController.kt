@@ -24,32 +24,18 @@ class DailyController(private val service: DailyService) {
     /** Returns the bible passage for a given date */
     @GetMapping("/{date}")
     fun getPassage(
-        @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") date: Date): ResponseEntity<Any> { // TODO :: implement custom response object
-        return try {
-            log.info { "Passage request received for $date" }
-
-            val response = service.retrievePassage(date)
-            ResponseEntity.ok(response)
-
-        } catch (e: Exception) {
-            log.error { e.message } // TODO :: implement proper err handle
-            ResponseEntity.ok("Some error!")
-        }
+        @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") date: Date): ResponseEntity<DailyPassageResponse> {
+        log.info { "Passage request received for $date" }
+        val response = service.retrievePassage(date)
+        return ResponseEntity.ok(response)
     }
 
     /** Returns the dates of historic daily passages */
     @GetMapping("/history")
-    fun getHistory(@RequestParam(defaultValue = "0") page: Int): ResponseEntity<Any> {
-        return try {
-            log.info { "Request for previous dates [page: $page]" }
-
-            val response = service.retrieveDates(page)
-            ResponseEntity.ok(response)
-
-        } catch (e: Exception) {
-            log.error { e.message } // TODO :: implement proper err handle
-            ResponseEntity.ok("Some error!")
-        }
+    fun getHistory(@RequestParam(defaultValue = "0") page: Int): ResponseEntity<HistoryResponse> {
+        log.info { "Request for previous dates [page: $page]" }
+        val response = service.retrieveDates(page)
+        return ResponseEntity.ok(response)
     }
 
 }

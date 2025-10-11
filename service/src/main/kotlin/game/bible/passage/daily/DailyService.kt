@@ -2,6 +2,7 @@ package game.bible.passage.daily
 
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
+import game.bible.passage.exception.ValidationException
 import game.bible.passage.generation.GenerationService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -21,26 +22,47 @@ class DailyService(
     private val generator: GenerationService,
     private val passageRepository: PassageRepository) {
 
-    private var date: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+    private var dateFormatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
 
     /** Generates a bible passage and retrieves it from storage */
-    fun retrievePassage(date: Date): Passage {
+    fun retrievePassage(date: Date): DailyPassageResponse {
         val entry = passageRepository.findByDate(date)
-
-        return if (entry.isPresent) {
+        val passage = if (entry.isPresent) {
             entry.get()
+        } else {
+            generatePassage(date)
+        }
 
-        } else generatePassage(date)
+        return DailyPassageResponse(
+            date = passage.date,
+            book = passage.book,
+            chapter = passage.chapter,
+            title = passage.title,
+            summary = passage.summary,
+            verses = passage.verses,
+            icon = passage.icon,
+            text = passage.text
+        )
     }
 
     /** Retrieves paginated list of historic daily passage */
-    fun retrieveDates(page: Int): List<String> {
+    fun retrieveDates(page: Int): HistoryResponse {
+        if (page < 0) {
+            throw ValidationException("Page number cannot be negative")
+        }
+
         val passages = passageRepository.findAll()
-        // TODO :: for a logged in user, return paginated results of all dates (attempted [color?], won [star?], not-attempted [question mark?])
+        // TODO: for a logged in user, return paginated results of all dates (attempted [color?], won [star?], not-attempted [question mark?])
         // for non-logged in user, just return all existing dates (paginate as required)
         // pagination -> pull back a month at a time!
 
-        return passages.map { date.format(it.date) }
+        val dates = passages.map { dateFormatter.format(it.date) }
+
+        return HistoryResponse(
+            dates = dates,
+            page = page,
+            total = dates.size
+        )
     }
 
     private fun generatePassage(date: Date): Passage {
