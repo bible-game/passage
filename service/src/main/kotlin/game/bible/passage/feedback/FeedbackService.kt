@@ -16,7 +16,6 @@ class FeedbackService(
     private val generationService: GenerationService,
     private val redis: StringRedisTemplate
 ) {
-
     /**
      * Processes user feedback on passage context
      */

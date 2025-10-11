@@ -25,18 +25,13 @@ class GuessController(private val service: GuessService) {
     @GetMapping("/{date}/{book}/{chapter}")
     fun getCloseness(
         @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") date: Date,
-        @PathVariable book: String, @PathVariable chapter: String
-    ): ResponseEntity<Any> { // Implement custom response object
-        return try {
-            val guess = Guess(date, book, chapter)
-            val response: Closeness = service.evaluate(guess)
-            ResponseEntity.ok(response)
-
-        } catch (e: Exception) {
-//            log.error("Some error!") // TODO :: proper err handle
-            log.error { e.message }
-            ResponseEntity.ok("Some error!")
-        }
+        @PathVariable book: String,
+        @PathVariable chapter: String
+    ): ResponseEntity<GuessResponse> {
+        log.info { "Guess request received for $date: $book $chapter" }
+        val guess = Guess(date, book, chapter)
+        val response = service.evaluate(guess)
+        return ResponseEntity.ok(response)
     }
 
 }

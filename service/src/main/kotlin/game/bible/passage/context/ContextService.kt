@@ -1,5 +1,6 @@
 package game.bible.passage.context
 
+import game.bible.passage.exception.ValidationException
 import game.bible.passage.generation.GenerationService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -17,23 +18,41 @@ class ContextService(
     private val postContextRepository: PostContextRepository) {
 
     /** Generates the pre-context for a given passage and retrieves it from storage */
-    fun retrievePreContext(passageKey: String): PreContext {
+    fun retrievePreContext(passageKey: String): PreContextResponse {
+        if (passageKey.isBlank()) {
+            throw ValidationException("Passage key cannot be blank")
+        }
+
         val entry = preContextRepository.findByPassageKey(passageKey)
-
-        return if (entry.isPresent) {
+        val preContext = if (entry.isPresent) {
             entry.get()
+        } else {
+            generatePreContext(passageKey)
+        }
 
-        } else generatePreContext(passageKey)
+        return PreContextResponse(
+            passageKey = preContext.passageKey,
+            text = preContext.text
+        )
     }
 
     /** Generates the post-context for a given passage and retrieves it from storage */
-    fun retrievePostContext(passageKey: String): PostContext {
+    fun retrievePostContext(passageKey: String): PostContextResponse {
+        if (passageKey.isBlank()) {
+            throw ValidationException("Passage key cannot be blank")
+        }
+
         val entry = postContextRepository.findByPassageKey(passageKey)
-
-        return if (entry.isPresent) {
+        val postContext = if (entry.isPresent) {
             entry.get()
+        } else {
+            generatePostContext(passageKey)
+        }
 
-        } else generatePostContext(passageKey)
+        return PostContextResponse(
+            passageKey = postContext.passageKey,
+            text = postContext.text
+        )
     }
 
     private fun generatePreContext(passageKey: String): PreContext {
@@ -45,9 +64,9 @@ class ContextService(
 
     private fun generatePostContext(passageKey: String): PostContext {
         log.info { "No entry exists for [$passageKey]! Generating post-context" }
-        val preContext = generator.postContext(passageKey)
+        val postContext = generator.postContext(passageKey)
 
-        return postContextRepository.save(preContext)
+        return postContextRepository.save(postContext)
     }
 
 }
