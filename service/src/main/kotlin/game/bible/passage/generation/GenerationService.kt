@@ -106,7 +106,7 @@ class GenerationService(
         log.info { "Asking ChatGPT for pre-context [$passageKey]" }
 
         val devPrompt: String = chat.getPreContext()!!.getPromptDeveloper()!!
-        val userPrompt: String = cachedPrompt ?: chat.getPreContext()!!.getPromptUser()!! + passageKey
+        val userPrompt: String = (cachedPrompt ?: chat.getPreContext()!!.getPromptUser()!!) + passageKey
 
         var context = ""
         message(devPrompt, userPrompt).forEach { x: String? -> context += x }
