@@ -27,7 +27,7 @@ class FeedbackService(
         log.info { "Received feedback for passage: ${request.passageKey}, sentiment: ${request.feedback}, promptType: ${request.promptType}" }
 
         if (request.feedback == FeedbackSentiment.NEGATIVE) {
-            val newPrompt = generationService.feedbackPrompt(request.passageKey, request.promptType)
+            val newPrompt = generationService.feedbackPrompt(request.comment ?: "I don't like it", request.promptType)
             redis.opsForValue().set("precontext:${System.currentTimeMillis()}", newPrompt)
 
             // TODO: Implement for other prompt types
