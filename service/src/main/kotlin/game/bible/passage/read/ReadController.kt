@@ -25,10 +25,10 @@ class ReadController(
 
     private var cache: Pair<String, String>? = null // todo :: update cache key to be today's value if exists or gen1
     private var default: String? = null
-
     @GetMapping("/{key}")
-    fun getReading(@PathVariable key: String): ResponseEntity<Any> {
-        val url = "${api.getBaseUrl()}/$key?single_chapter_book_matching=indifferent"
+
+    fun getReading(@PathVariable key: String, @RequestParam translation: String): ResponseEntity<Any> {
+        val url = "${api.getBaseUrl()}/$key?translation={translation}&single_chapter_book_matching=indifferent"
 
         if (key == "genesis1") {
             if (default.isNullOrEmpty()) {
