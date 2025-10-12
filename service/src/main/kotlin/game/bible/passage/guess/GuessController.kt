@@ -13,8 +13,6 @@ private val log = KotlinLogging.logger {}
 
 /**
  * Exposes Guess-related Actions
- *
- * @author J. R. Smith
  * @since 21st January 2025
  */
 @RestController
@@ -27,7 +25,7 @@ class GuessController(private val service: GuessService) {
         @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") date: Date,
         @PathVariable book: String,
         @PathVariable chapter: String
-    ): ResponseEntity<GuessResponse> {
+    ): ResponseEntity<Any> {
         log.info { "Guess request received for $date: $book $chapter" }
         val guess = Guess(date, book, chapter)
         val response = service.evaluate(guess)

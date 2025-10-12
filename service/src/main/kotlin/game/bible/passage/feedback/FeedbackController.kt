@@ -17,14 +17,12 @@ private val log = KotlinLogging.logger {}
 @RequestMapping("/feedback")
 class FeedbackController(private val service: FeedbackService) {
 
-    /**
-     * Receives user feedback on passage context
-     */
+    /** Accepts user feedback on generated content */
     @PostMapping
-    fun postFeedback(@RequestBody request: FeedbackRequest): ResponseEntity<FeedbackResponse> {
-        log.info { "Feedback request received for passage: ${request.passageKey}" }
-        val response = service.getFeedback(request)
+    fun feedback(@RequestBody feedback: Feedback): ResponseEntity<Boolean> {
+        log.info { "Feedback request received for passage: ${feedback.passageKey}" }
+        val success = service.process(feedback)
 
-        return ResponseEntity.ok(response)
+        return ResponseEntity.ok(success)
     }
 }

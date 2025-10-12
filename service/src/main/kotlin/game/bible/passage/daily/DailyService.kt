@@ -25,7 +25,7 @@ class DailyService(
     private var dateFormatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
 
     /** Generates a bible passage and retrieves it from storage */
-    fun retrievePassage(date: Date): DailyPassageResponse {
+    fun retrievePassage(date: Date): Passage {
         val entry = passageRepository.findByDate(date)
         val passage = if (entry.isPresent) {
             entry.get()
@@ -33,16 +33,6 @@ class DailyService(
             generatePassage(date)
         }
 
-        return DailyPassageResponse(
-            date = passage.date,
-            book = passage.book,
-            chapter = passage.chapter,
-            title = passage.title,
-            summary = passage.summary,
-            verses = passage.verses,
-            icon = passage.icon,
-            text = passage.text
-        )
     }
 
     /** Retrieves paginated list of historic daily passage */

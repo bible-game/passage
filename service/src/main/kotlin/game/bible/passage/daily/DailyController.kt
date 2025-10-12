@@ -1,5 +1,6 @@
 package game.bible.passage.daily
 
+import game.bible.passage.Passage
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
@@ -14,7 +15,6 @@ private val log = KotlinLogging.logger {}
 
 /**
  * Exposes Daily Passage-related Actions
- *
  * @since 7th December 2024
  */
 @RestController
@@ -24,7 +24,7 @@ class DailyController(private val service: DailyService) {
     /** Returns the bible passage for a given date */
     @GetMapping("/{date}")
     fun getPassage(
-        @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") date: Date): ResponseEntity<DailyPassageResponse> {
+        @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") date: Date): ResponseEntity<Passage> {
         log.info { "Passage request received for $date" }
         val response = service.retrievePassage(date)
         return ResponseEntity.ok(response)
