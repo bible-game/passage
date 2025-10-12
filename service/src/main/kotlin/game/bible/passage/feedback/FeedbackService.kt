@@ -12,24 +12,24 @@ import org.springframework.transaction.annotation.Transactional
 private val log = KotlinLogging.logger {}
 
 /**
- * Passage Feedback Service Logic
+ * User Feedback Service Logic
  * @since 3rd October 2025
  */
 @Service
 class FeedbackService(
+    private val redis: StringRedisTemplate,
     private val generationService: GenerationService,
-    private val preContextRepository: PreContextRepository,
-    private val redis: StringRedisTemplate
+    private val preContextRepository: PreContextRepository
 ) {
-    /** Processes user feedback on passage context
-     */
+    /** Processes user feedback on generated content */
     @Transactional
     fun process(feedback: Feedback): Boolean {
-        log.info { "Received feedback for passage: ${request.passageKey}, sentiment: ${request.feedback}, promptType: ${request.promptType}" }
+        log.info { "Received [${feedback.sentiment}] feedback on [${feedback.prompt}] generation type" }
 
         if (feedback.sentiment == NEGATIVE) {
-            val newPrompt = generationService.feedbackPrompt(request.comment ?: "I don't like it", request.promptType)
-            redis.opsForValue().set("${request.promptType}:${System.currentTimeMillis()}", newPrompt)
+            val comment = feedback.comment ?: "I don't like it"
+            val newPrompt = generationService.feedbackPrompt(comment, feedback.prompt)
+            redis.opsForValue().set("${feedback.prompt}:${System.currentTimeMillis()}", newPrompt)
 
             // TODO: Implement for other prompt types
             if (feedback.prompt == PRE_CONTEXT)

@@ -19,17 +19,19 @@ class ContextController(private val service: ContextService) {
 
     /** Returns the context leading up to a given passage */
     @GetMapping("/before/{passageKey}")
-    fun getPreContext(@PathVariable passageKey: String): ResponseEntity<PreContextResponse> {
+    fun getPreContext(@PathVariable passageKey: String): ResponseEntity<PreContext> {
         log.info { "Pre-context request received for $passageKey" }
         val response = service.retrievePreContext(passageKey)
+
         return ResponseEntity.ok(response)
     }
 
     /** Returns the context after a given passage */
     @GetMapping("/after/{passageKey}")
-    fun getPostContext(@PathVariable passageKey: String): ResponseEntity<PostContextResponse> {
+    fun getPostContext(@PathVariable passageKey: String): ResponseEntity<PostContext> {
         log.info { "Post-context request received for $passageKey" }
         val response = service.retrievePostContext(passageKey)
+
         return ResponseEntity.ok(response)
     }
 

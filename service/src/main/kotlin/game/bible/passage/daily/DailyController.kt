@@ -27,14 +27,16 @@ class DailyController(private val service: DailyService) {
         @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") date: Date): ResponseEntity<Passage> {
         log.info { "Passage request received for $date" }
         val response = service.retrievePassage(date)
+
         return ResponseEntity.ok(response)
     }
 
     /** Returns the dates of historic daily passages */
     @GetMapping("/history")
-    fun getHistory(@RequestParam(defaultValue = "0") page: Int): ResponseEntity<HistoryResponse> {
+    fun getHistory(@RequestParam(defaultValue = "0") page: Int): ResponseEntity<Any> {
         log.info { "Request for previous dates [page: $page]" }
         val response = service.retrieveDates(page)
+
         return ResponseEntity.ok(response)
     }
 
