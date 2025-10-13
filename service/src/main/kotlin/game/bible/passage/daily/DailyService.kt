@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.util.Date
 
-
 private val log = KotlinLogging.logger {}
 
 /**
  * Daily Passage Service Logic
- *
  * @since 7th December 2024
  */
 @Service
@@ -21,7 +19,7 @@ class DailyService(
     private val generator: GenerationService,
     private val passageRepository: PassageRepository) {
 
-    private var date: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+    private var date = SimpleDateFormat("yyyy-MM-dd")
 
     /** Generates a bible passage and retrieves it from storage */
     fun retrievePassage(date: Date): Passage {

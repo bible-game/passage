@@ -1,9 +1,10 @@
 package game.bible.passage.audio
 
+import game.bible.common.util.resource.S3BucketService
+import game.bible.passage.exception.ValidationException
 import game.bible.passage.generation.GenerationService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
-import game.bible.common.util.resource.S3BucketService
 
 private val log = KotlinLogging.logger {}
 
@@ -17,9 +18,17 @@ class AudioService(
     private val generator: GenerationService) {
 
     /** Retrieves the audio for a given passage */
-    fun retrieveAudio(passageKey: String): ByteArray {
+    fun retrieveAudio(passageKey: String): AudioResponse {
+        if (passageKey.isBlank()) {
+            throw ValidationException("Passage key cannot be blank")
+        }
 
-        return bucket.getAudio(passageKey) ?: generateAudio(passageKey)
+        val audioData = bucket.getAudio(passageKey) ?: generateAudio(passageKey)
+
+        return AudioResponse(
+            passageKey = passageKey,
+            audioData = audioData
+        )
     }
 
     /** Handles audio generation and retrieval from storage */

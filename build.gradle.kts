@@ -3,7 +3,7 @@ plugins {
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.spring") version "2.1.0"
     id("org.springframework.boot") version "3.4.0" apply false
-    id("net.researchgate.release") version "3.0.2"
+    id("net.researchgate.release") version "3.1.0"
     id("io.spring.dependency-management") version "1.1.6"
 }
 
@@ -53,8 +53,12 @@ subprojects {
     }
 
 
-    tasks.withType<Test> {
+    tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+
+        filter {
+            isFailOnNoMatchingTests = false
+        }
     }
 }
 

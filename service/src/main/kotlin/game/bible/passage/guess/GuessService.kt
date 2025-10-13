@@ -3,7 +3,9 @@ package game.bible.passage.guess
 import game.bible.config.model.domain.BibleConfig
 import game.bible.passage.Passage
 import game.bible.passage.PassageRepository
+import game.bible.passage.exception.PassageNotFoundException
 import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.xml.bind.ValidationException
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.floor
@@ -12,8 +14,6 @@ private val log = KotlinLogging.logger {}
 
 /**
  * Guess-related Service Logic
- *
- * @author J. R. Smith
  * @since 21st January 2025
  */
 @Service
@@ -38,13 +38,17 @@ class GuessService(
     }
 
     fun evaluate(guess: Guess): Closeness {
-        val answer = passageRepository.findByDate(guess.date).getOrNull()!!
-        // todo :: if null, throw Ex (code? 400?)
+        if (guess.book.isBlank())    throw ValidationException("Book cannot be blank")
+        if (guess.chapter.isBlank()) throw ValidationException("Chapter cannot be blank")
+
+        val answer = passageRepository.findByDate(guess.date).getOrNull()
+            ?: throw PassageNotFoundException("No passage found for date: ${guess.date}")
 
         val correct = (answer.book == guess.book && answer.chapter == guess.chapter)
         val closeness = if (correct) Closeness(0, 100)
-                        else calculateCloseness(answer, guess)
+        else calculateCloseness(answer, guess)
 
+        log.info { "Calculated ${closeness.percentage}" }
         return closeness
     }
 
@@ -52,17 +56,17 @@ class GuessService(
         val totalVerses = 31_102
         var verseDistance = 0
 
-        val guessIndex = verseMap.keys.indexOf("${guess.book}${guess.chapter}")
         val answerIndex = verseMap.keys.indexOf("${answer.book}${answer.chapter}")
+        val guessIndex = verseMap.keys.indexOf("${guess.book}${guess.chapter}")
+        if (guessIndex == -1)
+            throw ValidationException("Invalid key: ${guess.book}-${guess.chapter}")
 
         val lower = if (guessIndex <= answerIndex) guessIndex else answerIndex
         val upper = if (guessIndex <= answerIndex) answerIndex else guessIndex
 
         val chapters = verseMap.keys.toList().subList(lower, upper)
 
-        for (chapter in chapters) {
-            verseDistance += verseMap[chapter]!!
-        }
+        for (chapter in chapters) verseDistance += verseMap[chapter]!!
 
         val sign  = if (guessIndex < answerIndex) -1 else 1
 

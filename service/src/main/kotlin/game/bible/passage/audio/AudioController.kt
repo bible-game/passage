@@ -1,6 +1,8 @@
 package game.bible.passage.audio
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -20,16 +22,17 @@ class AudioController(private val service: AudioService) {
     /** Returns the audio for a given passage */
     @GetMapping("/{passageKey}")
     fun getAudio(@PathVariable passageKey: String): ResponseEntity<ByteArray> {
-        return try {
-            log.info { "Audio request received for $passageKey" }
-            val response: ByteArray = service.retrieveAudio(passageKey)
+        log.info { "Audio request received for $passageKey" }
+        val response: AudioResponse = service.retrieveAudio(passageKey)
 
-            ResponseEntity.ok(response)
-
-        } catch (e: Exception) {
-            log.error { e.message } // TODO :: implement proper err handle
-            ResponseEntity.notFound().build()
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.parseMediaType(response.contentType)
+            contentLength = response.sizeBytes.toLong()
         }
+
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(response.audioData)
     }
 
 }

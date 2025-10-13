@@ -21,14 +21,9 @@ class ConfigController(private val bible: BibleConfig) {
 
     /** Returns configured bible information */
     @GetMapping("/bible")
-    fun getBibleConfig(): ResponseEntity<Any> { // TODO :: implement custom response object
-        return try {
-            ResponseEntity.ok(bible)
-
-        } catch (e: Exception) {
-            log.error { e.message } // TODO :: implement proper err handle
-            ResponseEntity.ok("Some error!")
-        }
+    fun getBibleConfig(): ResponseEntity<BibleConfig> {
+        log.info { "Bible config request received" }
+        return ResponseEntity.ok(bible)
     }
 
 }
