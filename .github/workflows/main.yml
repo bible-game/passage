@@ -29,3 +29,6 @@ jobs:
     env:
       environment: prod
     uses: ./.github/workflows/step-deploy.yml
+    with:
+      task_definition_file: .aws/task-definition-prod.json
+      container_name: passage-prod

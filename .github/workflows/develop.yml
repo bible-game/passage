@@ -15,3 +15,6 @@ jobs:
     env:
       environment: dev
     uses: ./.github/workflows/step-deploy.yml
+    with:
+      task_definition_file: .aws/task-definition-dev.json
+      container_name: passage-dev
