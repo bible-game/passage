@@ -3,6 +3,9 @@ on:
   workflow_call:
 jobs:
   test:
+    permissions:
+      contents: read
+      packages: read
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
