@@ -6,7 +6,6 @@ on:
 jobs:
   test:
     name: test
-    environment: dev
     uses: ./.github/workflows/step-test.yml
     secrets:
       GH_PACKAGES_USER: ${{ secrets.GH_PACKAGES_USER }}
