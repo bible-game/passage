@@ -30,6 +30,9 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
+      - name: Get Version #️⃣
+        id: get-version
+        run: echo "VERSION=$(grep -oP 'version=\K[^\s]+' gradle.properties)" >> $GITHUB_OUTPUT
       - name: Login AWS 🔐
         uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
         with:
@@ -43,7 +46,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ steps.get-version.outputs.VERSION }}
         run: |
           docker build \
             --build-arg GH_PACKAGES_USER=${{ secrets.GH_PACKAGES_USER }} \
