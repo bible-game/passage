@@ -11,6 +11,9 @@ on:
       environment:
         required: true
         type: string
+      ecr_repository:
+        required: true
+        type: string
     secrets:
       AWS_REGION: { required: true }
       AWS_ACCESS_KEY_ID: { required: true }
@@ -21,6 +24,7 @@ on:
 env:
   ECS_TASK_DEFINITION: ${{ inputs.task_definition_file }}
   CONTAINER_NAME: ${{ inputs.container_name }}
+  ECR_REPOSITORY: ${{ inputs.ecr_repository }}
 
 jobs:
   deploy:

@@ -29,3 +29,4 @@ jobs:
       task_definition_file: .aws/task-definition-dev.json
       container_name: passage-dev
       environment: dev
+      ecr_repository: bible/passage
