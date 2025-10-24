@@ -11,6 +11,13 @@ on:
       environment:
         required: true
         type: string
+    secrets:
+      AWS_REGION: { required: true }
+      AWS_ACCESS_KEY_ID: { required: true }
+      AWS_SECRET_ACCESS_KEY: { required: true }
+      ECS_CLUSTER: { required: true }
+      GH_PACKAGES_USER: { required: true }
+      GH_PACKAGES_TOKEN: { required: true }
 env:
   ECS_TASK_DEFINITION: ${{ inputs.task_definition_file }}
   CONTAINER_NAME: ${{ inputs.container_name }}
