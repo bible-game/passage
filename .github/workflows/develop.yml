@@ -27,6 +27,7 @@ jobs:
       GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
     with:
       task_definition_file: .aws/task-definition-dev.json
-      container_name: passage-dev-service-ndsk9hgz
+      container_name: passage-dev
       environment: dev
       ecr_repository: bible/passage
+      ecs_service: arn:aws:ecs:us-east-1:970547366462:service/bible-dev/passage-dev-service-ndsk9hgz

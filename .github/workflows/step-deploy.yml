@@ -2,18 +2,11 @@ name: deploy
 on:
   workflow_call:
     inputs:
-      task_definition_file:
-        required: true
-        type: string
-      container_name:
-        required: true
-        type: string
-      environment:
-        required: true
-        type: string
-      ecr_repository:
-        required: true
-        type: string
+      task_definition_file: { required: true, type: string }
+      container_name: { required: true, type: string }
+      environment: { required: true, type: string }
+      ecr_repository: { required: true, type: string }
+      ecs_service: { required: true, type: string }
     secrets:
       AWS_REGION: { required: true }
       AWS_ACCESS_KEY_ID: { required: true }
@@ -69,6 +62,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.CONTAINER_NAME }}
+          service: ${{ inputs.ecs_service }}
           cluster: ${{ secrets.ECS_CLUSTER }}
           wait-for-service-stability: true
