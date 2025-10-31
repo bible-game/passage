@@ -15,7 +15,3 @@ spring:
     redis:
       host: localhost
       port: 6379
-
-application:
-  config:
-    dir: ${BLE_CONFIG}
