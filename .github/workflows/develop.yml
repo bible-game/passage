@@ -8,8 +8,8 @@ jobs:
     name: test
     uses: ./.github/workflows/step-test.yml
     secrets:
-      GH_PACKAGES_USER: ${{ secrets.GH_PACKAGES_USER }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: test
@@ -23,8 +23,8 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       ECS_CLUSTER: ${{ secrets.ECS_CLUSTER_DEV }}
-      GH_PACKAGES_USER: ${{ secrets.GH_PACKAGES_USER }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     with:
       task_definition_file: .aws/task-definition-dev.json
       container_name: passage-dev

@@ -1,6 +1,6 @@
 application:
   config:
-    dir: ${CONFIGURATION}
+    dir: "${CONFIGURATION:/etc/secrets/}"
 
 server:
   port: 8081
