@@ -1,17 +1,33 @@
-#name: develop
-#on:
-#  push:
-#    branches: [ develop ]
-#jobs:
-#  test:
-#    name: test
-#    uses: ./.github/workflows/step-test.yml
-#  deploy:
-#    needs: test
-#    name: deploy
-#    permissions:
-#      packages: write
-#      contents: write
-#    env:
-#      environment: dev
-#    uses: ./.github/workflows/step-deploy.yml
+name: develop
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  test:
+    name: test
+    uses: ./.github/workflows/step-test.yml
+    secrets:
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: test
+    name: deploy
+    permissions:
+      packages: write
+      contents: write
+    uses: ./.github/workflows/step-deploy.yml
+    secrets:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      ECS_CLUSTER: ${{ secrets.ECS_CLUSTER_DEV }}
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      task_definition_file: .aws/task-definition-dev.json
+      container_name: passage-dev
+      environment: dev
+      ecr_repository: bible/passage
+      ecs_service: arn:aws:ecs:us-east-1:970547366462:service/bible-dev/passage-dev-service-ndsk9hgz
