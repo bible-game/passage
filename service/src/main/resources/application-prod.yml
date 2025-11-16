@@ -11,3 +11,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
+  data:
+    redis:
+      url: ${REDIS_URL}
