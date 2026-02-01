@@ -23,14 +23,14 @@ jobs:
     permissions:
       contents: write
     uses: ./.github/workflows/step-merge.yml
-  deploy:
-    needs: merge
-    name: deploy
-    permissions:
-      packages: write
-      contents: write
-    uses: ./.github/workflows/step-deploy.yml
-    with:
-      task_definition_file: .aws/task-definition.json
-      container_name: passage
-      environment: prod
+#  deploy:
+#    needs: merge
+#    name: deploy
+#    permissions:
+#      packages: write
+#      contents: write
+#    uses: ./.github/workflows/step-deploy.yml
+#    with:
+#      task_definition_file: .aws/task-definition.json
+#      container_name: passage
+#      environment: prod
