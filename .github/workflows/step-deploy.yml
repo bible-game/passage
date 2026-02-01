@@ -12,8 +12,8 @@ on:
       AWS_ACCESS_KEY_ID: { required: true }
       AWS_SECRET_ACCESS_KEY: { required: true }
       ECS_CLUSTER: { required: true }
-      GH_PACKAGES_USER: { required: true }
-      GH_PACKAGES_TOKEN: { required: true }
+      GIT_ACTOR: { required: true }
+      GIT_TOKEN: { required: true }
 env:
   ECS_TASK_DEFINITION: ${{ inputs.task_definition_file }}
   CONTAINER_NAME: ${{ inputs.container_name }}
@@ -46,8 +46,8 @@ jobs:
           IMAGE_TAG: ${{ steps.get-version.outputs.VERSION }}
         run: |
           docker build \
-            --build-arg GH_PACKAGES_USER=${{ secrets.GH_PACKAGES_USER }} \
-            --build-arg GH_PACKAGES_TOKEN=${{ secrets.GH_PACKAGES_TOKEN }} \
+            --build-arg GIT_ACTOR=${{ secrets.GIT_ACTOR }} \
+            --build-arg GIT_TOKEN=${{ secrets.GIT_TOKEN }} \
             --build-arg PROFILE=${{ inputs.environment }} \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

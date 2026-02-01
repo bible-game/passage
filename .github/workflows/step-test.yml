@@ -2,8 +2,8 @@ name: test
 on:
   workflow_call:
     secrets:
-      GH_PACKAGES_USER: { required: true }
-      GH_PACKAGES_TOKEN: { required: true }
+      GIT_ACTOR: { required: true }
+      GIT_TOKEN: { required: true }
 jobs:
   test:
     concurrency: ci-${{ github.ref }}
@@ -20,6 +20,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Test 📐
         env:
-          GH_PACKAGES_USER: ${{ secrets.GH_PACKAGES_USER }}
-          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          GIT_ACTOR: ${{ secrets.GIT_ACTOR }}
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: ./gradlew test
