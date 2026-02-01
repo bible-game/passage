@@ -2,8 +2,8 @@
 FROM gradle:jdk21 AS build
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
-ARG GITHUB_ACTOR
-ARG GITHUB_TOKEN
+ARG GIT_ACTOR
+ARG GIT_TOKEN
 RUN gradle build --no-daemon -x test
 
 # Package
