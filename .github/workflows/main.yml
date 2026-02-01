@@ -7,6 +7,9 @@ jobs:
   test:
     name: test
     uses: ./.github/workflows/step-test.yml
+    secrets:
+      GIT_ACTOR: ${{ secrets.GIT_ACTOR }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
   release:
     needs: test
     name: release
