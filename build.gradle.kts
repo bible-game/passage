@@ -21,16 +21,16 @@ allprojects {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/bible-game/common")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("GIT_ACTOR")
+                password = System.getenv("GIT_TOKEN")
             }
         }
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/bible-game/config")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("GIT_ACTOR")
+                password = System.getenv("GIT_TOKEN")
             }
         }
     }

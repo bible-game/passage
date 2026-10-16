@@ -11,7 +11,7 @@ jobs:
 #      GIT_ACTOR: ${{ secrets.GIT_ACTOR }}
 #      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
   release:
-    needs: test
+#    needs: test
     name: release
     permissions:
       packages: write
