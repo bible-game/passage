@@ -40,4 +40,12 @@ class DailyController(private val service: DailyService) {
         return ResponseEntity.ok(response)
     }
 
+    /** Returns the passage id of each historic daily passage, keyed by date */
+    @GetMapping("/calendar")
+    fun getCalendar(): ResponseEntity<Map<String, Long>> {
+        log.info { "Request for calendar of passage ids" }
+
+        return ResponseEntity.ok(service.retrieveCalendar())
+    }
+
 }
