@@ -41,6 +41,10 @@ class DailyService(
         return passages.map { date.format(it.date) }
     }
 
+    /** Maps each historic daily passage's date to its passage id */
+    fun retrieveCalendar(): Map<String, Long> =
+        passageRepository.findAll().mapNotNull { p -> p.id?.let { date.format(p.date) to it } }.toMap()
+
     private fun generatePassage(date: Date): Passage {
         log.info { "No entry exists for [$date]! Generating random passage" }
         val randomPassage = generator.random(date)
