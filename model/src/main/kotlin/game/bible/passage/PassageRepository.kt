@@ -1,6 +1,7 @@
 package game.bible.passage
 
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.Date
 import java.util.Optional
@@ -13,5 +14,8 @@ import java.util.Optional
 interface PassageRepository : JpaRepository<Passage, Long> {
 
     fun findByDate(date: Date): Optional<Passage>
+
+    @Query("SELECT p.id, p.date FROM Passage p")
+    fun findAllIdsAndDates(): List<Array<Any>>
 
 }
