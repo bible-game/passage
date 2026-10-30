@@ -4,14 +4,14 @@ on:
     branches: [ main ]
   workflow_dispatch:
 jobs:
-#  test:
-#    name: test
-#    uses: ./.github/workflows/step-test.yml
-#    secrets:
-#      GIT_ACTOR: ${{ secrets.GIT_ACTOR }}
-#      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+  test:
+    name: test
+    uses: ./.github/workflows/step-test.yml
+    secrets:
+      GIT_ACTOR: ${{ secrets.GIT_ACTOR }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
   release:
-#    needs: test
+    needs: test
     name: release
     permissions:
       packages: write
@@ -23,14 +23,3 @@ jobs:
     permissions:
       contents: write
     uses: ./.github/workflows/step-bump.yml
-#  deploy:
-#    needs: bump
-#    name: deploy
-#    permissions:
-#      packages: write
-#      contents: write
-#    uses: ./.github/workflows/step-deploy.yml
-#    with:
-#      task_definition_file: .aws/task-definition.json
-#      container_name: passage
-#      environment: prod
