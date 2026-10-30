@@ -4,6 +4,7 @@ import game.bible.common.model.BaseEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import java.util.Date
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date
  * @since 7th December 2024
  */
 @Entity
-@Table(name = "passage")
+@Table(name = "passage", uniqueConstraints = [UniqueConstraint(columnNames = ["date"])]) // one passage per day
 data class Passage(
     val date: Date = Date(),
     val book: String = "",

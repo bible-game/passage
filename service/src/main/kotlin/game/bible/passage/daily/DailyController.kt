@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.Instant
 import java.util.Date
 
 private val log = KotlinLogging.logger {}
@@ -26,6 +27,10 @@ class DailyController(private val service: DailyService) {
     fun getPassage(
         @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") date: Date): ResponseEntity<Passage> {
         log.info { "Passage request received for $date" }
+        if (!DailyService.isReleased(date, Instant.now())) {
+            log.info { "Refusing passage request for a day that hasn't begun anywhere yet [$date]" }
+            return ResponseEntity.notFound().build()
+        }
         val response = service.retrievePassage(date)
 
         return ResponseEntity.ok(response)
