@@ -7,7 +7,7 @@ ARG GIT_TOKEN
 RUN gradle build --no-daemon -x test
 
 # Package
-FROM amazoncorretto:21-alpine-jdk
+FROM amazoncorretto:27-alpine-jdk
 COPY --from=build /home/gradle/src/service/build/libs/*.jar app.jar
 ARG PROFILE
 ENTRYPOINT ["java","-jar","-Dspring.profiles.active=${PROFILE}","app.jar"]
