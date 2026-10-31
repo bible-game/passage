@@ -7,6 +7,7 @@ import com.openai.models.ChatCompletion
 import com.openai.models.ChatCompletionCreateParams
 import com.openai.models.ChatModel
 import game.bible.config.model.domain.BibleConfig
+import game.bible.config.model.domain.BibleConfig.BibleTestamentConfig.BibleDivisionConfig.BibleBookConfig
 import game.bible.config.model.integration.BibleApiConfig
 import game.bible.config.model.integration.ChatGptConfig
 import game.bible.passage.Passage
@@ -54,14 +55,28 @@ class GenerationService(
     private val redis: StringRedisTemplate
 ) {
 
-    /** Generates a random bible passage */
-    fun random(date: Date): Passage {
-        val testament = bible.getTestaments()!!.random()
+    companion object {
+        /** How a passage's chapter is identified */
+        @JvmStatic
+        fun key(book: String, chapter: String) = "$book:$chapter"
 
-        val division = testament.getDivisions()!!.random()
-        val book = division.getBooks()!!.random()
-        val chapter = "${(1..book.getChapters()!!).random()}"
-        val verses = book.getVerses()!![chapter.toInt() - 1]
+        /** Picks chapters with equal chance, discounting recent ones (7 days) */
+        @JvmStatic
+        fun pick(books: List<BibleBookConfig>, recent: Set<String>): Pair<BibleBookConfig, Int> {
+            val chapters = books.flatMap { book -> (1..book.getChapters()!!).map { book to it } }
+
+            return chapters.filter { (book, chapter) -> key(book.getName()!!, "$chapter") !in recent }
+                .ifEmpty { chapters }
+                .random()
+        }
+    }
+
+    /** Generates a random passage for the day */
+    fun random(date: Date, recent: Set<String> = emptySet()): Passage {
+        val books = bible.getTestaments()!!.flatMap { it.getDivisions()!! }.flatMap { it.getBooks()!! }
+        val (book, number) = pick(books, recent)
+        val chapter = "$number"
+        val verses = book.getVerses()!![number - 1]
 
         val text = fetchText("${book.getKey()!!}+$chapter")
         val summary = summarise(text)
