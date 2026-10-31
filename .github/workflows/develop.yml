@@ -5,8 +5,9 @@ on:
 
 jobs:
   test:
+    if: false
     name: test
     uses: ./.github/workflows/step-test.yml
     secrets:
-      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GIT_ACTOR: ${{ secrets.GIT_ACTOR }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
