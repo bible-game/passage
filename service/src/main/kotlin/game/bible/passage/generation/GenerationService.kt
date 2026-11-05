@@ -1,5 +1,6 @@
 package game.bible.passage.generation
 
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.openai.client.OpenAIClient
@@ -68,6 +69,21 @@ class GenerationService(
             return chapters.filter { (book, chapter) -> key(book.getName()!!, "$chapter") !in recent }
                 .ifEmpty { chapters }
                 .random()
+        }
+
+        const val STUDY_ATTEMPTS = 3
+
+        @JvmStatic
+        fun resolveCorrect(question: Question): Question? {
+            val options = mapOf(
+                "optionOne" to question.optionOne,
+                "optionTwo" to question.optionTwo,
+                "optionThree" to question.optionThree,
+            )
+            if (question.correct in options.values) return question
+
+            val text = options[question.correct.trim()] ?: return null
+            return Question(question.content, question.optionOne, question.optionTwo, question.optionThree, text)
         }
     }
 
@@ -150,18 +166,39 @@ class GenerationService(
         val devPrompt: String = chat.getStudy()!!.getPromptDeveloper()!!
         val userPrompt: String = chat.getStudy()!!.getPromptUser()!! + passageKey
 
-        var response = ""
-        message(devPrompt, userPrompt).forEach { x: String? -> response += x }
-
         val study = Study(passageKey)
-        val questions: List<Question> = mapper.readValue(
-            response, mapper.typeFactory.constructCollectionType(List::class.java, Question::class.java))
+        val questions = studyQuestions(passageKey, devPrompt, userPrompt)
 
         questions.forEach { it.study = study }
         study.questions = questions
         study.goldenSummary = goldenSummary(passageKey)
 
         return study
+    }
+
+    /** Generates study questions with retries for malformed responses */
+    private fun studyQuestions(passageKey: String, devPrompt: String, userPrompt: String): List<Question> {
+        repeat(STUDY_ATTEMPTS) { attempt ->
+            var response = ""
+            message(devPrompt, userPrompt).forEach { x: String? -> response += x }
+
+            val questions: List<Question> = try {
+                val valueType = mapper.typeFactory.constructCollectionType(
+                    List::class.java,
+                    Question::class.java
+                )
+                mapper.readValue(response, valueType)
+            } catch (e: JsonProcessingException) {
+                log.warn { "Study [$passageKey] reply isn't valid JSON (attempt ${attempt + 1} of $STUDY_ATTEMPTS): ${e.originalMessage}" }
+                return@repeat
+            }
+            val resolved = questions.map { resolveCorrect(it) }
+
+            if (questions.isNotEmpty() && resolved.all { it != null }) return resolved.filterNotNull()
+            log.warn { "Study [$passageKey] has answers that match no option (attempt ${attempt + 1} of $STUDY_ATTEMPTS)" }
+        }
+
+        throw IllegalStateException("No valid study for [$passageKey] after $STUDY_ATTEMPTS attempts")
     }
 
     /** Generates a golden summary for a given passage */
