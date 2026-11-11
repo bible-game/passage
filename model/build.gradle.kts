@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.spring") version "2.1.0"
-    id("org.springframework.boot") version "3.4.0" apply false
+    id("org.springframework.boot") version "4.1.2" apply false
     id("io.spring.dependency-management") version "1.1.6"
     id("org.jetbrains.kotlin.plugin.noarg") version "2.1.20-Beta1"
     // TODO :: apply from ver cat
